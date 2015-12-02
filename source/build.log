@@ -1,0 +1,1169 @@
+checking for ICU version numbers... release 56.1, library 56.1, unicode version 8.0
+checking build system type... x86_64-unknown-linux-gnu
+checking host system type... x86_64-unknown-linux-gnu
+checking whether to build debug libraries... no
+checking whether to build release libraries... yes
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking whether we are using the GNU C++ compiler... yes
+checking whether g++ accepts -g... yes
+checking pkg-config is at least version 0.20... yes
+checking for ICULEHB... no
+checking how to run the C preprocessor... gcc -E
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for gmake... no
+checking for gnumake... no
+checking for doxygen... /usr/bin/doxygen
+checking checking for executable suffix... 
+checking whether strict compiling is on... yes
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking size of void *... 8
+checking whether runnable 64 bit binaries are built by default... yes
+checking which Makefile fragment to use for x86_64-unknown-linux-gnu... mh-linux
+checking for floor in -lm... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... no
+checking whether to enable auto cleanup of libraries... no
+checking whether to enable draft APIs... yes
+checking for ranlib... ranlib
+checking for ar... ar
+checking whether to enable renaming of symbols... yes
+checking whether to enable function and data tracing... no
+checking elf.h usability... yes
+checking elf.h presence... yes
+checking for elf.h... yes
+checking whether to enable dynamic loading of plugins. Ignored if plugins disabled.... yes
+checking dlfcn.h usability... yes
+checking dlfcn.h presence... yes
+checking for dlfcn.h... yes
+checking for library containing dlopen... -ldl
+checking for dlopen... yes
+checking for gettimeofday... yes
+checking if we have a C++ compiler... Good
+checking if #include <string> works... yes
+checking if #include <atomic> works... yes
+checking for pthread_attr_init in -lpthread... yes
+checking for mmap... yes
+checking for genccode assembly... -a gcc
+checking for inttypes.h... (cached) yes
+checking dirent.h usability... yes
+checking dirent.h presence... yes
+checking for dirent.h... yes
+checking whether byte ordering is bigendian... no
+checking for nl_langinfo... yes
+checking for nl_langinfo's argument to obtain the codeset... CODESET
+checking for namespace support... yes
+checking for properly overriding new and delete... yes
+checking for placement new and delete... yes
+checking for popen... yes
+checking for tzset... yes
+checking for tzname... yes
+checking for timezone... no
+checking for __timezone... yes
+checking for int8_t... yes
+checking for uint8_t... yes
+checking for int16_t... yes
+checking for uint16_t... yes
+checking for int32_t... yes
+checking for uint32_t... yes
+checking for int64_t... yes
+checking for uint64_t... yes
+checking wchar.h usability... yes
+checking wchar.h presence... yes
+checking for wchar.h... yes
+checking for library containing wcscpy... none required
+checking size of wchar_t... 4
+checking for UTF-16 string literal support... C++ only
+checking for a library suffix to use... none
+CPPFLAGS=-DHAVE_GCC_ATOMICS=0 $(THREADSCPPFLAGS)  -DU_HAVE_ELF_H=1 -DU_HAVE_ATOMIC=1 
+CFLAGS=   -O2  -fno-strict-aliasing   -std=c99 -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings $(THREADSCFLAGS) 
+CXXFLAGS= -std=gnu++1y  -O2  -fno-strict-aliasing   -W -Wall -pedantic -Wpointer-arith -Wwrite-strings -Wno-long-long $(THREADSCXXFLAGS) 
+configure: creating ./config.status
+config.status: creating icudefs.mk
+config.status: creating Makefile
+config.status: creating data/pkgdataMakefile
+config.status: creating config/Makefile.inc
+config.status: creating config/icu.pc
+config.status: creating config/pkgdataMakefile
+config.status: creating data/Makefile
+config.status: creating stubdata/Makefile
+config.status: creating common/Makefile
+config.status: creating i18n/Makefile
+config.status: creating layout/Makefile
+config.status: creating layoutex/Makefile
+config.status: creating io/Makefile
+config.status: creating extra/Makefile
+config.status: creating extra/uconv/Makefile
+config.status: creating extra/uconv/pkgdataMakefile
+config.status: creating extra/scrptrun/Makefile
+config.status: creating tools/Makefile
+config.status: creating tools/ctestfw/Makefile
+config.status: creating tools/toolutil/Makefile
+config.status: creating tools/makeconv/Makefile
+config.status: creating tools/genrb/Makefile
+config.status: creating tools/genccode/Makefile
+config.status: creating tools/gencmn/Makefile
+config.status: creating tools/gencnval/Makefile
+config.status: creating tools/gendict/Makefile
+config.status: creating tools/gentest/Makefile
+config.status: creating tools/gennorm2/Makefile
+config.status: creating tools/genbrk/Makefile
+config.status: creating tools/gensprep/Makefile
+config.status: creating tools/icuinfo/Makefile
+config.status: creating tools/icupkg/Makefile
+config.status: creating tools/icuswap/Makefile
+config.status: creating tools/pkgdata/Makefile
+config.status: creating tools/tzcode/Makefile
+config.status: creating tools/gencfu/Makefile
+config.status: creating test/Makefile
+config.status: creating test/compat/Makefile
+config.status: creating test/testdata/Makefile
+config.status: creating test/testdata/pkgdataMakefile
+config.status: creating test/hdrtst/Makefile
+config.status: creating test/intltest/Makefile
+config.status: creating test/cintltst/Makefile
+config.status: creating test/iotest/Makefile
+config.status: creating test/letest/Makefile
+config.status: creating test/perf/Makefile
+config.status: creating test/perf/collationperf/Makefile
+config.status: creating test/perf/collperf/Makefile
+config.status: creating test/perf/collperf2/Makefile
+config.status: creating test/perf/dicttrieperf/Makefile
+config.status: creating test/perf/ubrkperf/Makefile
+config.status: creating test/perf/charperf/Makefile
+config.status: creating test/perf/convperf/Makefile
+config.status: creating test/perf/normperf/Makefile
+config.status: creating test/perf/DateFmtPerf/Makefile
+config.status: creating test/perf/howExpensiveIs/Makefile
+config.status: creating test/perf/strsrchperf/Makefile
+config.status: creating test/perf/unisetperf/Makefile
+config.status: creating test/perf/usetperf/Makefile
+config.status: creating test/perf/ustrperf/Makefile
+config.status: creating test/perf/utfperf/Makefile
+config.status: creating test/perf/utrie2perf/Makefile
+config.status: creating test/perf/leperf/Makefile
+config.status: creating samples/Makefile
+config.status: creating samples/date/Makefile
+config.status: creating samples/cal/Makefile
+config.status: creating samples/layout/Makefile
+
+ICU for C/C++ 56.1 is ready to be built.
+=== Important Notes: ===
+Data Packaging: library
+ This means: ICU data will be linked with ICU. A shared data library will be built. 
+ To locate data: ICU will use the linked data library. If linked with the stub library located in stubdata/, the application can use udata_setCommonData() or set a data path to override.
+Building ICU: Use a GNU make such as make to build ICU.
+checking the version of "make"... make[2]: Entering directory `/hdd2/src/libo-org/src/workdir/UnpackedTarball/icu/source'
+3.81 (we wanted at least 3.80)
+make[2]: Leaving directory `/hdd2/src/libo-org/src/workdir/UnpackedTarball/icu/source'
+ok
+rebuilding config/icucross.mk
+rebuilding config/icucross.inc
+config/icu-uc.pc updated.
+config/icu-i18n.pc updated.
+config/icu-io.pc updated.
+mkdir lib
+mkdir bin
+make[2]: Making `all' in `stubdata'
+   (deps)	 stubdata.c
+Note: rebuild with "make VERBOSE=1 " to show all compiler parameters.
+   gcc	 ...  stubdata.c
+make[2]: Making `all' in `common'
+   (deps)	 pluralmap.cpp
+   (deps)	 unifiedcache.cpp
+   (deps)	 simplepatternformatter.cpp
+   (deps)	 uloc_keytype.cpp
+   (deps)	 sharedobject.cpp
+   (deps)	 ulistformatter.cpp
+   (deps)	 listformatter.cpp
+   (deps)	 icuplug.cpp
+   (deps)	 icudataver.c
+   (deps)	 uloc_tag.c
+   (deps)	 ulist.c
+   (deps)	 propsvec.c
+   (deps)	 ucnvsel.cpp
+   (deps)	 dtintrv.cpp
+   (deps)	 wintz.c
+   (deps)	 cwchar.c
+   (deps)	 locbased.cpp
+   (deps)	 parsepos.cpp
+   (deps)	 util_props.cpp
+   (deps)	 util.cpp
+   (deps)	 punycode.cpp
+   (deps)	 uts46.cpp
+   (deps)	 usprep.cpp
+   (deps)	 uidna.cpp
+   (deps)	 servslkf.cpp
+   (deps)	 servrbf.cpp
+   (deps)	 servlkf.cpp
+   (deps)	 servlk.cpp
+   (deps)	 servls.cpp
+   (deps)	 servnotf.cpp
+   (deps)	 serv.cpp
+   (deps)	 rbbitblb.cpp
+   (deps)	 rbbistbl.cpp
+   (deps)	 rbbisetb.cpp
+   (deps)	 rbbiscan.cpp
+   (deps)	 rbbirb.cpp
+   (deps)	 rbbinode.cpp
+   (deps)	 rbbidata.cpp
+   (deps)	 rbbi.cpp
+   (deps)	 filteredbrk.cpp
+   (deps)	 dictbe.cpp
+   (deps)	 brkeng.cpp
+   (deps)	 ubrk.cpp
+   (deps)	 brkiter.cpp
+   (deps)	 uarrsort.c
+   (deps)	 unifunct.cpp
+   (deps)	 unifilt.cpp
+   (deps)	 caniter.cpp
+   (deps)	 ruleiter.cpp
+   (deps)	 usetiter.cpp
+   (deps)	 uniset.cpp
+   (deps)	 uset.cpp
+   (deps)	 uniset_closure.cpp
+   (deps)	 uniset_props.cpp
+   (deps)	 uset_props.cpp
+   (deps)	 unisetspan.cpp
+   (deps)	 bmpset.cpp
+   (deps)	 utrie2_builder.cpp
+   (deps)	 utrie2.cpp
+   (deps)	 unames.cpp
+   (deps)	 usc_impl.c
+   (deps)	 utrie.cpp
+   (deps)	 uscript_props.cpp
+   (deps)	 uscript.c
+   (deps)	 ushape.cpp
+   (deps)	 ubidiln.c
+   (deps)	 ubidiwrt.c
+   (deps)	 ubidi.c
+   (deps)	 ubidi_props.c
+   (deps)	 propname.cpp
+   (deps)	 ucase.cpp
+   (deps)	 uprops.cpp
+   (deps)	 uchar.c
+   (deps)	 patternprops.cpp
+   (deps)	 uiter.cpp
+   (deps)	 uchriter.cpp
+   (deps)	 schriter.cpp
+   (deps)	 chariter.cpp
+   (deps)	 loadednormalizer2impl.cpp
+   (deps)	 unormcmp.cpp
+   (deps)	 unorm.cpp
+   (deps)	 normlzr.cpp
+   (deps)	 filterednormalizer2.cpp
+   (deps)	 normalizer2.cpp
+   (deps)	 normalizer2impl.cpp
+   (deps)	 ustr_titlecase_brkiter.cpp
+   (deps)	 unistr_titlecase_brkiter.cpp
+   (deps)	 ustrcase_locale.cpp
+   (deps)	 unistr_case_locale.cpp
+   (deps)	 utext.cpp
+   (deps)	 ustr_wcs.cpp
+   (deps)	 ustrtrns.cpp
+   (deps)	 ustrfmt.c
+   (deps)	 cstring.c
+   (deps)	 ucasemap_titlecase_brkiter.cpp
+   (deps)	 ucasemap.cpp
+   (deps)	 ustrcase.cpp
+   (deps)	 ustring.cpp
+   (deps)	 utf_impl.c
+   (deps)	 unistr_props.cpp
+   (deps)	 unistr_case.cpp
+   (deps)	 unistr.cpp
+   (deps)	 unistr_cnv.cpp
+   (deps)	 appendable.cpp
+   (deps)	 ustr_cnv.cpp
+   (deps)	 dictionarydata.cpp
+   (deps)	 ucharstrieiterator.cpp
+   (deps)	 ucharstriebuilder.cpp
+   (deps)	 ucharstrie.cpp
+   (deps)	 bytestrieiterator.cpp
+   (deps)	 bytestrie.cpp
+   (deps)	 bytestriebuilder.cpp
+   (deps)	 stringtriebuilder.cpp
+   (deps)	 stringpiece.cpp
+   (deps)	 bytestream.cpp
+   (deps)	 loclikely.cpp
+   (deps)	 locdispnames.cpp
+   (deps)	 locavailable.cpp
+   (deps)	 locutil.cpp
+   (deps)	 locid.cpp
+   (deps)	 uloc.cpp
+   (deps)	 locmap.c
+   (deps)	 ucat.c
+   (deps)	 messagepattern.cpp
+   (deps)	 resbund_cnv.cpp
+   (deps)	 resbund.cpp
+   (deps)	 uresdata.c
+   (deps)	 ures_cnv.c
+   (deps)	 uresbund.cpp
+   (deps)	 ucnv_ct.c
+   (deps)	 ucnvdisp.c
+   (deps)	 ucnv_set.c
+   (deps)	 ucnvisci.c
+   (deps)	 ucnv_lmb.c
+   (deps)	 ucnvhz.c
+   (deps)	 ucnv2022.cpp
+   (deps)	 ucnvmbcs.cpp
+   (deps)	 ucnv_ext.cpp
+   (deps)	 ucnvbocu.cpp
+   (deps)	 ucnvscsu.c
+   (deps)	 ucnv_u32.c
+   (deps)	 ucnv_u16.c
+   (deps)	 ucnv_u8.c
+   (deps)	 ucnv_u7.c
+   (deps)	 ucnvlat1.c
+   (deps)	 ucnv_cb.c
+   (deps)	 ucnv_io.cpp
+   (deps)	 ucnv_err.c
+   (deps)	 ucnv_cnv.c
+   (deps)	 ucnv_bld.cpp
+   (deps)	 ucnv.c
+   (deps)	 uvectr64.cpp
+   (deps)	 uvectr32.cpp
+   (deps)	 ustack.cpp
+   (deps)	 uvector.cpp
+   (deps)	 ustrenum.cpp
+   (deps)	 uenum.c
+   (deps)	 uhash_us.cpp
+   (deps)	 uhash.c
+   (deps)	 utrace.c
+   (deps)	 ucol_swp.cpp
+   (deps)	 udataswp.c
+   (deps)	 umapfile.c
+   (deps)	 udatamem.c
+   (deps)	 ucmndata.c
+   (deps)	 udata.cpp
+   (deps)	 charstr.cpp
+   (deps)	 cmemory.c
+   (deps)	 uobject.cpp
+   (deps)	 uinit.cpp
+   (deps)	 ucln_cmn.cpp
+   (deps)	 umutex.cpp
+   (deps)	 uinvchar.c
+   (deps)	 utypes.c
+   (deps)	 umath.c
+   (deps)	 putil.cpp
+   (deps)	 errorcode.cpp
+generating ../common/svchook.mk
+config.status: creating common/Makefile
+   g++	 ...  errorcode.cpp
+   g++	 ...  putil.cpp
+   gcc	 ...  umath.c
+   gcc	 ...  utypes.c
+   gcc	 ...  uinvchar.c
+   g++	 ...  umutex.cpp
+   g++	 ...  ucln_cmn.cpp
+   g++	 ...  uinit.cpp
+   g++	 ...  uobject.cpp
+   gcc	 ...  cmemory.c
+   g++	 ...  charstr.cpp
+   g++	 ...  udata.cpp
+   gcc	 ...  ucmndata.c
+   gcc	 ...  udatamem.c
+   gcc	 ...  umapfile.c
+   gcc	 ...  udataswp.c
+   g++	 ...  ucol_swp.cpp
+   gcc	 ...  utrace.c
+   gcc	 ...  uhash.c
+   g++	 ...  uhash_us.cpp
+   gcc	 ...  uenum.c
+   g++	 ...  ustrenum.cpp
+   g++	 ...  uvector.cpp
+   g++	 ...  ustack.cpp
+   g++	 ...  uvectr32.cpp
+   g++	 ...  uvectr64.cpp
+   gcc	 ...  ucnv.c
+   g++	 ...  ucnv_bld.cpp
+   gcc	 ...  ucnv_cnv.c
+   g++	 ...  ucnv_io.cpp
+   gcc	 ...  ucnv_cb.c
+   gcc	 ...  ucnv_err.c
+   gcc	 ...  ucnvlat1.c
+   gcc	 ...  ucnv_u7.c
+   gcc	 ...  ucnv_u8.c
+   gcc	 ...  ucnv_u16.c
+   gcc	 ...  ucnv_u32.c
+   gcc	 ...  ucnvscsu.c
+   g++	 ...  ucnvbocu.cpp
+   g++	 ...  ucnv_ext.cpp
+   g++	 ...  ucnvmbcs.cpp
+   g++	 ...  ucnv2022.cpp
+   gcc	 ...  ucnvhz.c
+   gcc	 ...  ucnv_lmb.c
+   gcc	 ...  ucnvisci.c
+   gcc	 ...  ucnvdisp.c
+   gcc	 ...  ucnv_set.c
+   gcc	 ...  ucnv_ct.c
+   g++	 ...  uresbund.cpp
+   gcc	 ...  ures_cnv.c
+   gcc	 ...  uresdata.c
+   g++	 ...  resbund.cpp
+   g++	 ...  resbund_cnv.cpp
+   g++	 ...  messagepattern.cpp
+   gcc	 ...  ucat.c
+   gcc	 ...  locmap.c
+   g++	 ...  uloc.cpp
+   g++	 ...  locid.cpp
+   g++	 ...  locutil.cpp
+   g++	 ...  locavailable.cpp
+   g++	 ...  locdispnames.cpp
+   g++	 ...  loclikely.cpp
+   g++	 ...  locresdata.cpp
+   g++	 ...  bytestream.cpp
+   g++	 ...  stringpiece.cpp
+   g++	 ...  stringtriebuilder.cpp
+   g++	 ...  bytestriebuilder.cpp
+   g++	 ...  bytestrie.cpp
+   g++	 ...  bytestrieiterator.cpp
+   g++	 ...  ucharstrie.cpp
+   g++	 ...  ucharstriebuilder.cpp
+   g++	 ...  ucharstrieiterator.cpp
+   g++	 ...  dictionarydata.cpp
+   g++	 ...  appendable.cpp
+   g++	 ...  ustr_cnv.cpp
+   g++	 ...  unistr_cnv.cpp
+   g++	 ...  unistr.cpp
+   g++	 ...  unistr_case.cpp
+   g++	 ...  unistr_props.cpp
+   gcc	 ...  utf_impl.c
+   g++	 ...  ustring.cpp
+   g++	 ...  ustrcase.cpp
+   g++	 ...  ucasemap.cpp
+   g++	 ...  ucasemap_titlecase_brkiter.cpp
+   gcc	 ...  cstring.c
+   gcc	 ...  ustrfmt.c
+   g++	 ...  ustrtrns.cpp
+   g++	 ...  ustr_wcs.cpp
+   g++	 ...  utext.cpp
+   g++	 ...  unistr_case_locale.cpp
+   g++	 ...  ustrcase_locale.cpp
+   g++	 ...  unistr_titlecase_brkiter.cpp
+   g++	 ...  ustr_titlecase_brkiter.cpp
+   g++	 ...  normalizer2impl.cpp
+   g++	 ...  normalizer2.cpp
+   g++	 ...  filterednormalizer2.cpp
+   g++	 ...  normlzr.cpp
+   g++	 ...  unorm.cpp
+   g++	 ...  unormcmp.cpp
+   g++	 ...  loadednormalizer2impl.cpp
+   g++	 ...  chariter.cpp
+   g++	 ...  schriter.cpp
+   g++	 ...  uchriter.cpp
+   g++	 ...  uiter.cpp
+   g++	 ...  patternprops.cpp
+   gcc	 ...  uchar.c
+   g++	 ...  uprops.cpp
+   g++	 ...  ucase.cpp
+   g++	 ...  propname.cpp
+   gcc	 ...  ubidi_props.c
+   gcc	 ...  ubidi.c
+   gcc	 ...  ubidiwrt.c
+   gcc	 ...  ubidiln.c
+   g++	 ...  ushape.cpp
+   gcc	 ...  uscript.c
+   g++	 ...  uscript_props.cpp
+   gcc	 ...  usc_impl.c
+   g++	 ...  unames.cpp
+   g++	 ...  utrie.cpp
+   g++	 ...  utrie2.cpp
+   g++	 ...  utrie2_builder.cpp
+   g++	 ...  bmpset.cpp
+   g++	 ...  unisetspan.cpp
+   g++	 ...  uset_props.cpp
+   g++	 ...  uniset_props.cpp
+   g++	 ...  uniset_closure.cpp
+   g++	 ...  uset.cpp
+   g++	 ...  uniset.cpp
+   g++	 ...  usetiter.cpp
+   g++	 ...  ruleiter.cpp
+   g++	 ...  caniter.cpp
+   g++	 ...  unifilt.cpp
+   g++	 ...  unifunct.cpp
+   gcc	 ...  uarrsort.c
+   g++	 ...  brkiter.cpp
+   g++	 ...  ubrk.cpp
+   g++	 ...  brkeng.cpp
+   g++	 ...  dictbe.cpp
+   g++	 ...  filteredbrk.cpp
+   g++	 ...  rbbi.cpp
+   g++	 ...  rbbidata.cpp
+   g++	 ...  rbbinode.cpp
+   g++	 ...  rbbirb.cpp
+   g++	 ...  rbbiscan.cpp
+   g++	 ...  rbbisetb.cpp
+   g++	 ...  rbbistbl.cpp
+   g++	 ...  rbbitblb.cpp
+   g++	 ...  serv.cpp
+   g++	 ...  servnotf.cpp
+   g++	 ...  servls.cpp
+   g++	 ...  servlk.cpp
+   g++	 ...  servlkf.cpp
+   g++	 ...  servrbf.cpp
+   g++	 ...  servslkf.cpp
+   g++	 ...  uidna.cpp
+   g++	 ...  usprep.cpp
+   g++	 ...  uts46.cpp
+   g++	 ...  punycode.cpp
+   g++	 ...  util.cpp
+   g++	 ...  util_props.cpp
+   g++	 ...  parsepos.cpp
+   g++	 ...  locbased.cpp
+   gcc	 ...  cwchar.c
+   gcc	 ...  wintz.c
+   g++	 ...  dtintrv.cpp
+   g++	 ...  ucnvsel.cpp
+   gcc	 ...  propsvec.c
+   gcc	 ...  ulist.c
+   gcc	 ...  uloc_tag.c
+   gcc	 ...  icudataver.c
+   g++	 ...  icuplug.cpp
+   g++	 ...  listformatter.cpp
+   g++	 ...  ulistformatter.cpp
+   g++	 ...  sharedobject.cpp
+   g++	 ...  simplepatternformatter.cpp
+sharedobject.cpp:18:1: warning: unused parameter ‘fromWithinCache’ [-Wunused-parameter]
+ SharedObject::addRef(UBool fromWithinCache) const {
+ ^
+   g++	 ...  unifiedcache.cpp
+   g++	 ...  uloc_keytype.cpp
+   g++	 ...  pluralmap.cpp
+make[2]: Making `all' in `i18n'
+   (deps)	 visibledigits.cpp
+   (deps)	 decimfmtimpl.cpp
+   (deps)	 smallintformatter.cpp
+   (deps)	 affixpatternparser.cpp
+   (deps)	 precision.cpp
+   (deps)	 pluralaffix.cpp
+   (deps)	 valueformatter.cpp
+   (deps)	 digitaffix.cpp
+   (deps)	 digitformatter.cpp
+   (deps)	 digitinterval.cpp
+   (deps)	 digitgrouping.cpp
+   (deps)	 scientificnumberformatter.cpp
+   (deps)	 sharedbreakiterator.cpp
+   (deps)	 measunit.cpp
+   (deps)	 quantityformatter.cpp
+   (deps)	 reldatefmt.cpp
+   (deps)	 uregion.cpp
+   (deps)	 identifier_info.cpp
+   (deps)	 scriptset.cpp
+   (deps)	 region.cpp
+   (deps)	 compactdecimalformat.cpp
+   (deps)	 tzfmt.cpp
+   (deps)	 tzgnames.cpp
+   (deps)	 tznames_impl.cpp
+   (deps)	 tznames.cpp
+   (deps)	 alphaindex.cpp
+   (deps)	 decContext.c
+   (deps)	 decNumber.c
+   (deps)	 ufieldpositer.cpp
+   (deps)	 locdspnm.cpp
+   (deps)	 fpositer.cpp
+   (deps)	 fphdlimp.cpp
+   (deps)	 vzone.cpp
+   (deps)	 zrule.cpp
+   (deps)	 ztrans.cpp
+   (deps)	 smpdtfst.cpp
+   (deps)	 decfmtst.cpp
+   (deps)	 uspoof_wsconf.cpp
+   (deps)	 uspoof_conf.cpp
+   (deps)	 uspoof_build.cpp
+   (deps)	 uspoof_impl.cpp
+   (deps)	 uspoof.cpp
+   (deps)	 currpinf.cpp
+   (deps)	 tmutfmt.cpp
+   (deps)	 tmutamt.cpp
+   (deps)	 tmunit.cpp
+   (deps)	 udateintervalformat.cpp
+   (deps)	 dtitvinf.cpp
+   (deps)	 dtitvfmt.cpp
+   (deps)	 selfmt.cpp
+   (deps)	 plurfmt.cpp
+   (deps)	 plurrule.cpp
+   (deps)	 upluralrules.cpp
+   (deps)	 zonemeta.cpp
+   (deps)	 vtzone.cpp
+   (deps)	 tztrans.cpp
+   (deps)	 tzrule.cpp
+   (deps)	 rbtz.cpp
+   (deps)	 dtrule.cpp
+   (deps)	 basictz.cpp
+   (deps)	 winnmfmt.cpp
+   (deps)	 windtfmt.cpp
+   (deps)	 wintzimpl.cpp
+   (deps)	 inputext.cpp
+   (deps)	 csrutf8.cpp
+   (deps)	 csrucode.cpp
+   (deps)	 csrsbcs.cpp
+   (deps)	 csrmbcs.cpp
+   (deps)	 csrecog.cpp
+   (deps)	 csr2022.cpp
+   (deps)	 csmatch.cpp
+   (deps)	 csdetect.cpp
+   (deps)	 utmscale.c
+   (deps)	 measure.cpp
+   (deps)	 currunit.cpp
+   (deps)	 curramt.cpp
+   (deps)	 currfmt.cpp
+   (deps)	 measfmt.cpp
+   (deps)	 ulocdata.c
+   (deps)	 uregexc.cpp
+   (deps)	 uregex.cpp
+   (deps)	 regeximp.cpp
+   (deps)	 regextxt.cpp
+   (deps)	 regexst.cpp
+   (deps)	 repattrn.cpp
+   (deps)	 rematch.cpp
+   (deps)	 regexcmp.cpp
+   (deps)	 brktrans.cpp
+   (deps)	 transreg.cpp
+   (deps)	 quant.cpp
+   (deps)	 nortrans.cpp
+   (deps)	 uni2name.cpp
+   (deps)	 name2uni.cpp
+   (deps)	 anytrans.cpp
+   (deps)	 toupptrn.cpp
+   (deps)	 tolowtrn.cpp
+   (deps)	 titletrn.cpp
+   (deps)	 casetrn.cpp
+   (deps)	 remtrans.cpp
+   (deps)	 nultrans.cpp
+   (deps)	 rbt_set.cpp
+   (deps)	 rbt_rule.cpp
+   (deps)	 rbt_pars.cpp
+   (deps)	 rbt_data.cpp
+   (deps)	 rbt.cpp
+   (deps)	 cpdtrans.cpp
+   (deps)	 tridpars.cpp
+   (deps)	 strrepl.cpp
+   (deps)	 funcrepl.cpp
+   (deps)	 unesctrn.cpp
+   (deps)	 esctrn.cpp
+   (deps)	 utrans.cpp
+   (deps)	 translit.cpp
+   (deps)	 stsearch.cpp
+   (deps)	 search.cpp
+   (deps)	 usearch.cpp
+   (deps)	 strmatch.cpp
+   (deps)	 collationfastlatinbuilder.cpp
+   (deps)	 collationbuilder.cpp
+   (deps)	 collationruleparser.cpp
+   (deps)	 collationweights.cpp
+   (deps)	 collationdatabuilder.cpp
+   (deps)	 collationrootelements.cpp
+   (deps)	 collationroot.cpp
+   (deps)	 rulebasedcollator.cpp
+   (deps)	 collationkeys.cpp
+   (deps)	 collationfastlatin.cpp
+   (deps)	 collationcompare.cpp
+   (deps)	 uitercollationiterator.cpp
+   (deps)	 collationsets.cpp
+   (deps)	 utf8collationiterator.cpp
+   (deps)	 utf16collationiterator.cpp
+   (deps)	 collationiterator.cpp
+   (deps)	 collationfcd.cpp
+   (deps)	 collationdatawriter.cpp
+   (deps)	 collationdatareader.cpp
+   (deps)	 collationtailoring.cpp
+   (deps)	 collationdata.cpp
+   (deps)	 collationsettings.cpp
+   (deps)	 collation.cpp
+   (deps)	 ucol_sit.cpp
+   (deps)	 ucol_res.cpp
+   (deps)	 ucol.cpp
+   (deps)	 ucoleitr.cpp
+   (deps)	 bocsu.cpp
+   (deps)	 sortkey.cpp
+   (deps)	 coll.cpp
+   (deps)	 coleitr.cpp
+   (deps)	 ethpccal.cpp
+   (deps)	 dangical.cpp
+   (deps)	 coptccal.cpp
+   (deps)	 cecal.cpp
+   (deps)	 chnsecal.cpp
+   (deps)	 indiancal.cpp
+   (deps)	 hebrwcal.cpp
+   (deps)	 gregoimp.cpp
+   (deps)	 japancal.cpp
+   (deps)	 islamcal.cpp
+   (deps)	 persncal.cpp
+   (deps)	 buddhcal.cpp
+   (deps)	 taiwncal.cpp
+   (deps)	 astro.cpp
+   (deps)	 olsontz.cpp
+   (deps)	 simpletz.cpp
+   (deps)	 timezone.cpp
+   (deps)	 gregocal.cpp
+   (deps)	 calendar.cpp
+   (deps)	 ucal.cpp
+   (deps)	 ucsdet.cpp
+   (deps)	 unumsys.cpp
+   (deps)	 numsys.cpp
+   (deps)	 rbnf.cpp
+   (deps)	 nfsubs.cpp
+   (deps)	 nfrule.cpp
+   (deps)	 nfrs.cpp
+   (deps)	 udatpg.cpp
+   (deps)	 dtptngen.cpp
+   (deps)	 udat.cpp
+   (deps)	 dtfmtsym.cpp
+   (deps)	 reldtfmt.cpp
+   (deps)	 smpdtfmt.cpp
+   (deps)	 datefmt.cpp
+   (deps)	 choicfmt.cpp
+   (deps)	 fmtable_cnv.cpp
+   (deps)	 digitlst.cpp
+   (deps)	 ucurr.cpp
+   (deps)	 dcfmtsym.cpp
+   (deps)	 decimalformatpattern.cpp
+   (deps)	 decimfmt.cpp
+   (deps)	 unum.cpp
+   (deps)	 numfmt.cpp
+   (deps)	 umsg.cpp
+   (deps)	 msgfmt.cpp
+   (deps)	 format.cpp
+   (deps)	 fmtable.cpp
+   (deps)	 ucln_in.cpp
+   g++	 ...  ucln_in.cpp
+   g++	 ...  fmtable.cpp
+   g++	 ...  msgfmt.cpp
+   g++	 ...  format.cpp
+   g++	 ...  umsg.cpp
+   g++	 ...  numfmt.cpp
+   g++	 ...  unum.cpp
+   g++	 ...  decimfmt.cpp
+   g++	 ...  decimalformatpattern.cpp
+   g++	 ...  dcfmtsym.cpp
+   g++	 ...  ucurr.cpp
+   g++	 ...  digitlst.cpp
+   g++	 ...  fmtable_cnv.cpp
+   g++	 ...  choicfmt.cpp
+   g++	 ...  datefmt.cpp
+   g++	 ...  smpdtfmt.cpp
+   g++	 ...  reldtfmt.cpp
+   g++	 ...  dtfmtsym.cpp
+   g++	 ...  udat.cpp
+   g++	 ...  dtptngen.cpp
+   g++	 ...  udatpg.cpp
+   g++	 ...  nfrs.cpp
+   g++	 ...  nfrule.cpp
+   g++	 ...  nfsubs.cpp
+   g++	 ...  rbnf.cpp
+   g++	 ...  numsys.cpp
+   g++	 ...  unumsys.cpp
+   g++	 ...  ucsdet.cpp
+   g++	 ...  ucal.cpp
+   g++	 ...  calendar.cpp
+   g++	 ...  gregocal.cpp
+   g++	 ...  timezone.cpp
+   g++	 ...  simpletz.cpp
+   g++	 ...  olsontz.cpp
+   g++	 ...  astro.cpp
+   g++	 ...  taiwncal.cpp
+   g++	 ...  buddhcal.cpp
+   g++	 ...  persncal.cpp
+   g++	 ...  islamcal.cpp
+   g++	 ...  japancal.cpp
+   g++	 ...  gregoimp.cpp
+   g++	 ...  hebrwcal.cpp
+   g++	 ...  indiancal.cpp
+   g++	 ...  chnsecal.cpp
+   g++	 ...  cecal.cpp
+   g++	 ...  coptccal.cpp
+   g++	 ...  dangical.cpp
+   g++	 ...  ethpccal.cpp
+   g++	 ...  coleitr.cpp
+   g++	 ...  coll.cpp
+   g++	 ...  sortkey.cpp
+   g++	 ...  bocsu.cpp
+   g++	 ...  ucoleitr.cpp
+   g++	 ...  ucol.cpp
+   g++	 ...  ucol_res.cpp
+   g++	 ...  ucol_sit.cpp
+   g++	 ...  collation.cpp
+   g++	 ...  collationsettings.cpp
+   g++	 ...  collationdata.cpp
+   g++	 ...  collationtailoring.cpp
+   g++	 ...  collationdatareader.cpp
+   g++	 ...  collationdatawriter.cpp
+   g++	 ...  collationfcd.cpp
+   g++	 ...  collationiterator.cpp
+   g++	 ...  utf16collationiterator.cpp
+   g++	 ...  utf8collationiterator.cpp
+   g++	 ...  uitercollationiterator.cpp
+   g++	 ...  collationsets.cpp
+   g++	 ...  collationcompare.cpp
+   g++	 ...  collationfastlatin.cpp
+   g++	 ...  collationkeys.cpp
+   g++	 ...  rulebasedcollator.cpp
+   g++	 ...  collationroot.cpp
+   g++	 ...  collationrootelements.cpp
+   g++	 ...  collationdatabuilder.cpp
+   g++	 ...  collationweights.cpp
+   g++	 ...  collationruleparser.cpp
+   g++	 ...  collationbuilder.cpp
+   g++	 ...  collationfastlatinbuilder.cpp
+   g++	 ...  strmatch.cpp
+   g++	 ...  usearch.cpp
+   g++	 ...  search.cpp
+   g++	 ...  stsearch.cpp
+   g++	 ...  translit.cpp
+   g++	 ...  utrans.cpp
+   g++	 ...  esctrn.cpp
+   g++	 ...  unesctrn.cpp
+   g++	 ...  funcrepl.cpp
+   g++	 ...  strrepl.cpp
+   g++	 ...  tridpars.cpp
+   g++	 ...  cpdtrans.cpp
+   g++	 ...  rbt.cpp
+   g++	 ...  rbt_data.cpp
+   g++	 ...  rbt_pars.cpp
+   g++	 ...  rbt_rule.cpp
+   g++	 ...  rbt_set.cpp
+   g++	 ...  nultrans.cpp
+   g++	 ...  remtrans.cpp
+   g++	 ...  casetrn.cpp
+   g++	 ...  titletrn.cpp
+   g++	 ...  tolowtrn.cpp
+   g++	 ...  toupptrn.cpp
+   g++	 ...  anytrans.cpp
+   g++	 ...  name2uni.cpp
+   g++	 ...  uni2name.cpp
+   g++	 ...  nortrans.cpp
+   g++	 ...  quant.cpp
+   g++	 ...  transreg.cpp
+   g++	 ...  brktrans.cpp
+   g++	 ...  regexcmp.cpp
+   g++	 ...  rematch.cpp
+   g++	 ...  repattrn.cpp
+   g++	 ...  regexst.cpp
+   g++	 ...  regextxt.cpp
+   g++	 ...  regeximp.cpp
+   g++	 ...  uregex.cpp
+   g++	 ...  uregexc.cpp
+   gcc	 ...  ulocdata.c
+   g++	 ...  measfmt.cpp
+   g++	 ...  currfmt.cpp
+   g++	 ...  curramt.cpp
+   g++	 ...  currunit.cpp
+   g++	 ...  measure.cpp
+   gcc	 ...  utmscale.c
+   g++	 ...  csdetect.cpp
+   g++	 ...  csmatch.cpp
+   g++	 ...  csr2022.cpp
+   g++	 ...  csrecog.cpp
+   g++	 ...  csrmbcs.cpp
+   g++	 ...  csrsbcs.cpp
+   g++	 ...  csrucode.cpp
+   g++	 ...  csrutf8.cpp
+   g++	 ...  inputext.cpp
+   g++	 ...  wintzimpl.cpp
+   g++	 ...  windtfmt.cpp
+   g++	 ...  winnmfmt.cpp
+   g++	 ...  basictz.cpp
+   g++	 ...  dtrule.cpp
+   g++	 ...  rbtz.cpp
+   g++	 ...  tzrule.cpp
+   g++	 ...  tztrans.cpp
+   g++	 ...  vtzone.cpp
+   g++	 ...  zonemeta.cpp
+   g++	 ...  upluralrules.cpp
+   g++	 ...  plurrule.cpp
+   g++	 ...  plurfmt.cpp
+   g++	 ...  selfmt.cpp
+   g++	 ...  dtitvfmt.cpp
+   g++	 ...  dtitvinf.cpp
+   g++	 ...  udateintervalformat.cpp
+   g++	 ...  tmunit.cpp
+   g++	 ...  tmutamt.cpp
+   g++	 ...  tmutfmt.cpp
+   g++	 ...  currpinf.cpp
+   g++	 ...  uspoof.cpp
+   g++	 ...  uspoof_impl.cpp
+   g++	 ...  uspoof_build.cpp
+   g++	 ...  uspoof_conf.cpp
+   g++	 ...  uspoof_wsconf.cpp
+   g++	 ...  decfmtst.cpp
+   g++	 ...  smpdtfst.cpp
+   g++	 ...  ztrans.cpp
+   g++	 ...  zrule.cpp
+   g++	 ...  vzone.cpp
+   g++	 ...  fphdlimp.cpp
+   g++	 ...  fpositer.cpp
+   g++	 ...  ufieldpositer.cpp
+   g++	 ...  locdspnm.cpp
+   gcc	 ...  decNumber.c
+   gcc	 ...  decContext.c
+   g++	 ...  alphaindex.cpp
+   g++	 ...  tznames.cpp
+   g++	 ...  tznames_impl.cpp
+   g++	 ...  tzgnames.cpp
+   g++	 ...  tzfmt.cpp
+   g++	 ...  compactdecimalformat.cpp
+   g++	 ...  gender.cpp
+   g++	 ...  region.cpp
+   g++	 ...  scriptset.cpp
+   g++	 ...  identifier_info.cpp
+   g++	 ...  uregion.cpp
+   g++	 ...  reldatefmt.cpp
+   g++	 ...  quantityformatter.cpp
+   g++	 ...  measunit.cpp
+   g++	 ...  sharedbreakiterator.cpp
+   g++	 ...  scientificnumberformatter.cpp
+   g++	 ...  digitgrouping.cpp
+   g++	 ...  digitinterval.cpp
+   g++	 ...  digitformatter.cpp
+   g++	 ...  digitaffix.cpp
+   g++	 ...  valueformatter.cpp
+   g++	 ...  digitaffixesandpadding.cpp
+   g++	 ...  pluralaffix.cpp
+digitformatter.cpp: In member function ‘icu_56::UnicodeString& icu_56::DigitFormatter::format(const icu_56::VisibleDigits&, const icu_56::DigitGrouping&, const icu_56::DigitFormatterOptions&, icu_56::FieldPositionHandler&, icu_56::UnicodeString&) const’:
+digitformatter.cpp:234:80: warning: ‘fracBegin’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+         handler.addAttribute(UNUM_FRACTION_FIELD, fracBegin, appendTo.length());
+                                                                                ^
+   g++	 ...  precision.cpp
+   g++	 ...  affixpatternparser.cpp
+   g++	 ...  smallintformatter.cpp
+   g++	 ...  decimfmtimpl.cpp
+   g++	 ...  visibledigits.cpp
+decimfmtimpl.cpp: In member function ‘icu_56::UnicodeString& icu_56::DecimalFormatImpl::toNumberPattern(UBool, int32_t, icu_56::UnicodeString&) const’:
+decimfmtimpl.cpp:1477:43: warning: ‘sigMax’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+             if (i >= sigMax || i < sigMax - sigMin) {
+                                           ^
+decimfmtimpl.cpp:1477:43: warning: ‘sigMin’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+make[2]: Making `all' in `io'
+   (deps)	 ucln_io.cpp
+   (deps)	 sprintf.c
+   (deps)	 ustream.cpp
+   (deps)	 sscanf.c
+   (deps)	 uscanf_p.c
+   (deps)	 ustdio.c
+   (deps)	 uscanf.c
+   (deps)	 uprntf_p.c
+   (deps)	 uprintf.cpp
+   (deps)	 ufmt_cmn.c
+   (deps)	 ufile.c
+   (deps)	 locbund.cpp
+   g++	 ...  locbund.cpp
+   gcc	 ...  ufile.c
+   g++	 ...  uprintf.cpp
+   gcc	 ...  ufmt_cmn.c
+   gcc	 ...  uprntf_p.c
+   gcc	 ...  uscanf.c
+   gcc	 ...  uscanf_p.c
+   gcc	 ...  ustdio.c
+   gcc	 ...  sprintf.c
+   gcc	 ...  sscanf.c
+   g++	 ...  ustream.cpp
+   g++	 ...  ucln_io.cpp
+make[2]: Making `all' in `tools'
+make[3]: Making `all' in `toolutil'
+   (deps)	 ucln_tu.cpp
+   (deps)	 udbgutil.cpp
+   (deps)	 filetools.cpp
+   (deps)	 dbgutil.cpp
+   (deps)	 flagparser.c
+   (deps)	 ppucd.cpp
+   (deps)	 pkg_gencmn.c
+   (deps)	 pkg_genc.c
+   (deps)	 pkg_icu.cpp
+   (deps)	 xmlparser.cpp
+   (deps)	 ucbuf.c
+   (deps)	 uparse.c
+   (deps)	 writesrc.c
+   (deps)	 uoptions.c
+   (deps)	 ucmstate.c
+   (deps)	 ucm.c
+   (deps)	 denseranges.cpp
+   (deps)	 collationinfo.cpp
+   (deps)	 unewdata.c
+   (deps)	 swapimpl.cpp
+   (deps)	 pkgitems.cpp
+   (deps)	 package.cpp
+   (deps)	 filestrm.c
+   gcc	 ...  filestrm.c
+   g++	 ...  package.cpp
+   g++	 ...  pkgitems.cpp
+   g++	 ...  swapimpl.cpp
+   g++	 ...  toolutil.cpp
+   gcc	 ...  unewdata.c
+   g++	 ...  collationinfo.cpp
+   g++	 ...  denseranges.cpp
+   gcc	 ...  ucm.c
+   gcc	 ...  ucmstate.c
+   gcc	 ...  uoptions.c
+   gcc	 ...  uparse.c
+   gcc	 ...  ucbuf.c
+   g++	 ...  xmlparser.cpp
+   gcc	 ...  writesrc.c
+   g++	 ...  pkg_icu.cpp
+   gcc	 ...  pkg_genc.c
+   gcc	 ...  pkg_gencmn.c
+   g++	 ...  ppucd.cpp
+   gcc	 ...  flagparser.c
+   g++	 ...  filetools.cpp
+   g++	 ...  udbgutil.cpp
+   g++	 ...  dbgutil.cpp
+   g++	 ...  ucln_tu.cpp
+make[3]: Making `all' in `ctestfw'
+   (deps)	 ucln_ct.c
+   (deps)	 datamap.cpp
+   (deps)	 testdata.cpp
+   (deps)	 uperf.cpp
+   (deps)	 tstdtmod.cpp
+   (deps)	 ctest.c
+   g++	 ...  tstdtmod.cpp
+   g++	 ...  testdata.cpp
+   gcc	 ...  ctest.c
+   g++	 ...  datamap.cpp
+   g++	 ...  uperf.cpp
+   gcc	 ...  ucln_ct.c
+make[3]: Making `all' in `makeconv'
+   (deps)	 gencnvex.c
+   (deps)	 genmbcs.cpp
+   (deps)	 ucnvstat.c
+   (deps)	 makeconv.cpp
+   gcc	 ...  ucnvstat.c
+   g++	 ...  genmbcs.cpp
+   g++	 ...  makeconv.cpp
+   gcc	 ...  gencnvex.c
+config.status: creating tools/makeconv/makeconv.1
+make[3]: Making `all' in `genrb'
+   (deps)	 prscmnts.cpp
+   (deps)	 rle.c
+   (deps)	 wrtjava.cpp
+   (deps)	 wrtxml.cpp
+   (deps)	 rbutil.c
+   (deps)	 ustr.c
+   (deps)	 reslist.cpp
+   (deps)	 read.c
+   (deps)	 parse.cpp
+   (deps)	 genrb.cpp
+   (deps)	 errmsg.c
+   gcc	 ...  errmsg.c
+   g++	 ...  parse.cpp
+   gcc	 ...  read.c
+   g++	 ...  genrb.cpp
+   g++	 ...  reslist.cpp
+   gcc	 ...  ustr.c
+   gcc	 ...  rbutil.c
+   g++	 ...  wrtjava.cpp
+   gcc	 ...  rle.c
+   g++	 ...  wrtxml.cpp
+   g++	 ...  prscmnts.cpp
+   g++	 ...  derb.cpp
+config.status: creating tools/genrb/derb.1
+config.status: creating tools/genrb/genrb.1
+make[3]: Making `all' in `genbrk'
+   (deps)	 genbrk.cpp
+   g++	 ...  genbrk.cpp
+config.status: creating tools/genbrk/genbrk.1
+make[3]: Making `all' in `gencnval'
+   (deps)	 gencnval.c
+   gcc	 ...  gencnval.c
+config.status: creating tools/gencnval/gencnval.1
+make[3]: Making `all' in `gensprep'
+   (deps)	 store.c
+   (deps)	 gensprep.c
+   gcc	 ...  gensprep.c
+   gcc	 ...  store.c
+config.status: creating tools/gensprep/gensprep.8
+make[3]: Making `all' in `icuinfo'
+   (deps)	 icuinfo.cpp
+   g++	 ...  icuinfo.cpp
+make[3]: Making `all' in `genccode'
+   (deps)	 genccode.c
+   gcc	 ...  genccode.c
+config.status: creating tools/genccode/genccode.8
+make[3]: Making `all' in `gencmn'
+   (deps)	 gencmn.c
+   gcc	 ...  gencmn.c
+config.status: creating tools/gencmn/gencmn.8
+make[3]: Making `all' in `icupkg'
+   (deps)	 icupkg.cpp
+   g++	 ...  icupkg.cpp
+config.status: creating tools/icupkg/icupkg.8
+make[3]: Making `all' in `pkgdata'
+   (deps)	 pkgtypes.c
+   (deps)	 pkgdata.cpp
+   g++	 ...  pkgdata.cpp
+   gcc	 ...  pkgtypes.c
+config.status: creating tools/pkgdata/pkgdata.1
+make[3]: Making `all' in `gentest'
+   (deps)	 genres32.c
+   (deps)	 gentest.c
+   gcc	 ...  gentest.c
+   gcc	 ...  genres32.c
+make[3]: Making `all' in `gennorm2'
+   (deps)	 n2builder.cpp
+   (deps)	 gennorm2.cpp
+   g++	 ...  gennorm2.cpp
+   g++	 ...  n2builder.cpp
+make[3]: Making `all' in `gencfu'
+   (deps)	 gencfu.cpp
+   g++	 ...  gencfu.cpp
+config.status: creating tools/gencfu/gencfu.1
+make[3]: Making `all' in `gendict'
+   (deps)	 gendict.cpp
+   g++	 ...  gendict.cpp
+config.status: creating tools/gendict/gendict.1
+make[2]: Making `all' in `data'
+/bin/bash ../mkinstalldirs ./out ./out/build ./out/build/icudt56l ./out/build/icudt56l/curr ./out/build/icudt56l/lang ./out/build/icudt56l/region ./out/build/icudt56l/zone ./out/build/icudt56l/unit ./out/build/icudt56l/brkitr ./out/build/icudt56l/coll ./out/build/icudt56l/rbnf ./out/build/icudt56l/translit ./out/tmp ./out/tmp/curr ./out/tmp/lang ./out/tmp/region ./out/tmp/zone ./out/tmp/unit ./out/tmp/coll ./out/tmp/rbnf ./out/tmp/translit ./out/tmp/brkitr
+mkdir ./out
+mkdir ./out/build
+mkdir ./out/build/icudt56l
+mkdir ./out/build/icudt56l/curr
+mkdir ./out/build/icudt56l/lang
+mkdir ./out/build/icudt56l/region
+mkdir ./out/build/icudt56l/zone
+mkdir ./out/build/icudt56l/unit
+mkdir ./out/build/icudt56l/brkitr
+mkdir ./out/build/icudt56l/coll
+mkdir ./out/build/icudt56l/rbnf
+mkdir ./out/build/icudt56l/translit
+mkdir ./out/tmp
+mkdir ./out/tmp/curr
+mkdir ./out/tmp/lang
+mkdir ./out/tmp/region
+mkdir ./out/tmp/zone
+mkdir ./out/tmp/unit
+mkdir ./out/tmp/coll
+mkdir ./out/tmp/rbnf
+mkdir ./out/tmp/translit
+mkdir ./out/tmp/brkitr
+Unpacking ./in/icudt56l.dat and generating out/tmp/icudata.lst (list of data files)
+pkgdata: gcc -DHAVE_GCC_ATOMICS=0 -D_REENTRANT  -DU_HAVE_ELF_H=1 -DU_HAVE_ATOMIC=1  -DU_ATTRIBUTE_DEPRECATED= -O2  -fno-strict-aliasing   -std=c99 -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings   -c -I../common -I../common -DPIC -fPIC -o ./out/tmp/icudt56l_dat.o ./out/tmp/icudt56l_dat.S
+pkgdata: gcc -O2  -fno-strict-aliasing   -std=c99 -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings   -Wl,--hash-style=gnu   -Wl,-Bsymbolic-functions -Wl,--dynamic-list-cpp-new -Wl,--dynamic-list-cpp-typeinfo  -Wl,-rpath,'$ORIGIN' -shared -Wl,-Bsymbolic-functions  -o ../lib/libicudata.so.56.1 ./out/tmp/icudt56l_dat.o -Wl,-soname -Wl,libicudata.so.56  -Wl,-Bsymbolic
+pkgdata: cd ../lib/ && rm -f libicudata.so.56 && ln -s libicudata.so.56.1 libicudata.so.56
+pkgdata: cd ../lib/ && rm -f libicudata.so && ln -s libicudata.so.56.1 libicudata.so
+make[2]: Making `all' in `extra'
+make[3]: Making `all' in `uconv'
+   g++	 ...  uconv.cpp
+   gcc	 ...  uwmsg.c
+mkdir uconvmsg
+ar: creating uconvmsg/libuconvmsg.a
+config.status: creating extra/uconv/uconv.1
+pkgdata: gcc -DHAVE_GCC_ATOMICS=0 -D_REENTRANT  -DU_HAVE_ELF_H=1 -DU_HAVE_ATOMIC=1  -DU_ATTRIBUTE_DEPRECATED= -O2  -fno-strict-aliasing   -std=c99 -Wall -pedantic -Wshadow -Wpointer-arith -Wmissing-prototypes -Wwrite-strings   -c -I../../common -I../../common -DPIC -fPIC -o uconvmsg/uconvmsg_dat.o uconvmsg/uconvmsg_dat.S
+pkgdata: ar r uconvmsg/libuconvmsg.a uconvmsg/uconvmsg_dat.o
+pkgdata: ranlib uconvmsg/libuconvmsg.a
+make[2]: Making `all' in `test'
+Note: rebuild with "make VERBOSE=1 all-local" to show all compiler parameters.
