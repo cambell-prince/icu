@@ -1082,6 +1082,8 @@ foundBest:
         // Did we find a word on this iteration? If so, push it on the break stack
         if (cuWordLength > 0) {
             foundBreaks.push((current+cuWordLength), status);
+        } else {
+            utext_next32(text);
         }
     }
     
@@ -1096,15 +1098,14 @@ foundBest:
 
 bool
 KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const {
-    UText ut;
-    UErrorCode status;
-    utext_clone(&ut, text, false, true, &status);
+    UErrorCode status = U_ZERO_ERROR;
+    UText* ut = utext_clone(NULL, text, false, true, &status);
     int32_t nat = start;
-    utext_setNativeIndex(&ut, nat);
+    utext_setNativeIndex(ut, nat);
     bool foundFirst = true;
     while (nat < end)
     {
-        UChar32 c = utext_current32(&ut);
+        UChar32 c = utext_current32(ut);
         if (c == ZWSP || c == WJ)
         {
             if (c == ZWSP)
@@ -1114,11 +1115,11 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
                 before = nat - 1;
                 for (int i = 0; i < 3; ++i) // scan backwards 3 clusters
                 {
-                    c = utext_previous32(&ut);
+                    c = utext_previous32(ut);
                     while (before > start && fMarkSet.contains(c))  // scan back across cluster marks
                     {
                         --before;
-                        c = utext_previous32(&ut);
+                        c = utext_previous32(ut);
                     }
                     if (!fBaseSet.contains(c) || before < start)    // not a cluster start so finish
                     {
@@ -1130,15 +1131,15 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
             }
 
             after = nat + 1;        // now scan forwards
-            utext_setNativeIndex(&ut, nat);
+            utext_setNativeIndex(ut, nat);
             for (int i = 0; i < 3; ++i)     // scan forwards 3 clusters
             {
-                c = utext_next32(&ut);
+                c = utext_next32(ut);
                 if (fBaseSet.contains(c))
                 {
                     while (++after < end)
                     {
-                        c = utext_next32(&ut);
+                        c = utext_next32(ut);
                         if (!fMarkSet.contains(c))
                             break;
                     }
@@ -1149,7 +1150,8 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
                     break;
                 }
             }
-
+            nat = after + 1;
+            
             if (c == ZWSP || c == WJ)       // did we hit another one?
             {
                 foundFirst = false;         // don't scan backwards for before next time
@@ -1160,8 +1162,10 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
         }
 
         ++nat;              // keep hunting
-        utext_next32(&ut);
+        utext_next32(ut);
     }
+
+    utext_close(ut);
 
     if (nat > end)
     {

@@ -14,7 +14,7 @@
 #include "unicode/bytestrie.h"
 #include "unicode/udata.h"
 #include "cmemory.h"
-q
+
 #if !UCONFIG_NO_BREAK_ITERATION
 
 U_NAMESPACE_BEGIN
