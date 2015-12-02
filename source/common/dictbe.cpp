@@ -130,7 +130,7 @@ public:
     ~PossibleWord() {};
   
     // Fill the list of candidates if needed, select the longest, and return the number found
-    int32_t   candidates( UText *text, DictionaryMatcher *dict, int32_t rangeEnd );
+    int32_t   candidates( UText *text, DictionaryMatcher *dict, int32_t rangeEnd, UnicodeSet const *ignoreSet = NULL, int32_t minLength = 0 );
   
     // Select the currently marked candidate, point after it in the text, and invalidate self
     int32_t   acceptMarked( UText *text );
@@ -151,12 +151,12 @@ public:
 };
 
 
-int32_t PossibleWord::candidates( UText *text, DictionaryMatcher *dict, int32_t rangeEnd ) {
+int32_t PossibleWord::candidates( UText *text, DictionaryMatcher *dict, int32_t rangeEnd, UnicodeSet const *ignoreSet, int32_t minLength) {
     // TODO: If getIndex is too slow, use offset < 0 and add discardAll()
     int32_t start = (int32_t)utext_getNativeIndex(text);
     if (start != offset) {
         offset = start;
-        count = dict->matches(text, rangeEnd-start, UPRV_LENGTHOF(cuLengths), cuLengths, cpLengths, NULL, &prefix);
+        count = dict->matches(text, rangeEnd-start, UPRV_LENGTHOF(cuLengths), cuLengths, cpLengths, NULL, &prefix, ignoreSet, minLength);
         // Dictionary leaves text after longest prefix, not longest word. Back up.
         if (count <= 0) {
             utext_setNativeIndex(text, start);
@@ -848,7 +848,7 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
     : DictionaryBreakEngine((1 << UBRK_WORD) | (1 << UBRK_LINE)),
       fDictionary(adoptDictionary)
 {
-    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]]"), status);
+    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]\\u200B\\u2060]"), status);
     if (U_SUCCESS(status)) {
         setCharacters(fKhmerWordSet);
     }
@@ -867,7 +867,9 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 //    fBeginWordSet.add(0x0E40, 0x0E44);      // SARA E through SARA AI MAIMALAI
 //    fSuffixSet.add(THAI_PAIYANNOI);
 //    fSuffixSet.add(THAI_MAIYAMOK);
-
+    fIgnoreSet.add(0x2060); // WJ
+    fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]&[:^M:]]"), status);
+    
     // Compact for caching.
     fMarkSet.compact();
     fEndWordSet.compact();
@@ -894,21 +896,42 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     int32_t current;
     UErrorCode status = U_ZERO_ERROR;
     PossibleWord words[KHMER_LOOKAHEAD];
+    int32_t before = 0;
+    int32_t after = 0;
+    int32_t nextAfter = 0;
+    int32_t scanStart = rangeStart;
+    int32_t scanEnd = rangeEnd;
+     
+    if (rangeStart > 0) {
+        scanStart = rangeStart - 1;
+    }
+    if (utext_nativeLength(text) > rangeEnd) {
+        scanEnd = rangeEnd + 1;
+    }
 
     utext_setNativeIndex(text, rangeStart);
 
+    scanWJ(text, scanStart, scanEnd, before, nextAfter);
     while (U_SUCCESS(status) && (current = (int32_t)utext_getNativeIndex(text)) < rangeEnd) {
         cuWordLength = 0;
         cpWordLength = 0;
 
+
         // Look for candidate words at the current position
-        int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd);
+        int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2);
 
         // If we found exactly one, use that
         if (candidates == 1) {
-            cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-            cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
-            wordsFound += 1;
+            int32_t endCandidate = utext_getNativeIndex(text);
+            if ((endCandidate < before || endCandidate >= nextAfter) && endCandidate >= after) {
+                cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
+                cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
+                wordsFound += 1;
+            }
+            if (endCandidate > before) {
+                after = nextAfter;
+                scanWJ(text, scanStart, scanEnd, before, nextAfter);
+            }
         }
 
         // If there was more than one, see which one can take us forward the most words
@@ -919,7 +942,18 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
             }
             do {
                 int32_t wordsMatched = 1;
-                if (words[(wordsFound + 1) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd) > 0) {
+                int32_t endCandidate = utext_getNativeIndex(text);
+                if ((endCandidate >= before && endCandidate < nextAfter) || endCandidate < after) {
+                    wordsMatched = 0;
+                }
+                if (endCandidate > before) {
+                    after = nextAfter;
+                    scanWJ(text, scanStart, scanEnd, before, nextAfter);
+                }
+                if (wordsMatched == 0) {
+                    continue;
+                }
+                if (words[(wordsFound + 1) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2) > 0) {
                     if (wordsMatched < 2) {
                         // Followed by another dictionary word; mark first word as a good candidate
                         words[wordsFound % KHMER_LOOKAHEAD].markCurrent();
@@ -934,7 +968,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                     // See if any of the possible second words is followed by a third word
                     do {
                         // If we find a third word, stop right away
-                        if (words[(wordsFound + 2) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd)) {
+                        if (words[(wordsFound + 2) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2)) {
                             words[wordsFound % KHMER_LOOKAHEAD].markCurrent();
                             goto foundBest;
                         }
@@ -1059,6 +1093,84 @@ foundBest:
 
     return wordsFound;
 }
+
+bool
+KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const {
+    UText ut;
+    UErrorCode status;
+    utext_clone(&ut, text, false, true, &status);
+    int32_t nat = start;
+    utext_setNativeIndex(&ut, nat);
+    bool foundFirst = true;
+    while (nat < end)
+    {
+        UChar32 c = utext_current32(&ut);
+        if (c == ZWSP || c == WJ)
+        {
+            if (c == ZWSP)
+                start = nat + 1; // only update pointer for ZWSP
+            if (foundFirst)      // only scan backwards for first inhibitor
+            {
+                before = nat - 1;
+                for (int i = 0; i < 3; ++i) // scan backwards 3 clusters
+                {
+                    c = utext_previous32(&ut);
+                    while (before > start && fMarkSet.contains(c))  // scan back across cluster marks
+                    {
+                        --before;
+                        c = utext_previous32(&ut);
+                    }
+                    if (!fBaseSet.contains(c) || before < start)    // not a cluster start so finish
+                    {
+                        ++before;                                   // bad char so break before char after
+                        break;
+                    }
+                    --before;               // go round again
+                }                   // ignore hitting previous inhibitor since scanning for it should have found us!
+            }
+
+            after = nat + 1;        // now scan forwards
+            utext_setNativeIndex(&ut, nat);
+            for (int i = 0; i < 3; ++i)     // scan forwards 3 clusters
+            {
+                c = utext_next32(&ut);
+                if (fBaseSet.contains(c))
+                {
+                    while (++after < end)
+                    {
+                        c = utext_next32(&ut);
+                        if (!fMarkSet.contains(c))
+                            break;
+                    }
+                }
+                else
+                {
+                    --after;        // bad char so break after char before it
+                    break;
+                }
+            }
+
+            if (c == ZWSP || c == WJ)       // did we hit another one?
+            {
+                foundFirst = false;         // don't scan backwards for before next time
+                continue;
+            }
+            else
+                break;
+        }
+
+        ++nat;              // keep hunting
+        utext_next32(&ut);
+    }
+
+    if (nat > end)
+    {
+        start = before = after = nat;
+        return false;       // failed to find anything
+    }
+    return true;            // yup hit one
+}
+
 
 #if !UCONFIG_NO_NORMALIZATION
 /*

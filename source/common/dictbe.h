@@ -321,7 +321,14 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   UnicodeSet                fEndWordSet; 
   UnicodeSet                fBeginWordSet; 
   UnicodeSet                fMarkSet; 
-  DictionaryMatcher  *fDictionary; 
+  UnicodeSet                fBaseSet;
+  UnicodeSet                fIgnoreSet;
+  DictionaryMatcher  *fDictionary;
+  
+  const int32_t WJ   = 0x2060;
+  const int32_t ZWSP = 0x200B;
+
+  bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
  
  public: 
  

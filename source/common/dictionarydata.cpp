@@ -14,7 +14,7 @@
 #include "unicode/bytestrie.h"
 #include "unicode/udata.h"
 #include "cmemory.h"
-
+q
 #if !UCONFIG_NO_BREAK_ITERATION
 
 U_NAMESPACE_BEGIN
@@ -42,7 +42,7 @@ int32_t UCharsDictionaryMatcher::getType() const {
 
 int32_t UCharsDictionaryMatcher::matches(UText *text, int32_t maxLength, int32_t limit,
                             int32_t *lengths, int32_t *cpLengths, int32_t *values,
-                            int32_t *prefix) const {
+                            int32_t *prefix, UnicodeSet const* ignoreSet, int32_t minLength) const {
 
     UCharsTrie uct(characters);
     int32_t startingTextIndex = utext_getNativeIndex(text);
@@ -53,7 +53,13 @@ int32_t UCharsDictionaryMatcher::matches(UText *text, int32_t maxLength, int32_t
         UStringTrieResult result = (codePointsMatched == 0) ? uct.first(c) : uct.next(c);
         int32_t lengthMatched = utext_getNativeIndex(text) - startingTextIndex;
         codePointsMatched += 1;
+        if (ignoreSet != NULL && ignoreSet->contains(c)) {
+            continue;
+        }
         if (USTRINGTRIE_HAS_VALUE(result)) {
+            if (codePointsMatched < minLength) {
+                continue;
+            }
             if (wordCount < limit) {
                 if (values != NULL) {
                     values[wordCount] = uct.getValue();
@@ -110,7 +116,7 @@ int32_t BytesDictionaryMatcher::getType() const {
 
 int32_t BytesDictionaryMatcher::matches(UText *text, int32_t maxLength, int32_t limit,
                             int32_t *lengths, int32_t *cpLengths, int32_t *values,
-                            int32_t *prefix) const {
+                            int32_t *prefix, UnicodeSet const* ignoreSet, int32_t minLength) const {
     BytesTrie bt(characters);
     int32_t startingTextIndex = utext_getNativeIndex(text);
     int32_t wordCount = 0;
@@ -120,7 +126,13 @@ int32_t BytesDictionaryMatcher::matches(UText *text, int32_t maxLength, int32_t 
         UStringTrieResult result = (codePointsMatched == 0) ? bt.first(transform(c)) : bt.next(transform(c));
         int32_t lengthMatched = utext_getNativeIndex(text) - startingTextIndex;
         codePointsMatched += 1;
+        if (ignoreSet != NULL && ignoreSet->contains(c)) {
+            continue;
+        }
         if (USTRINGTRIE_HAS_VALUE(result)) {
+            if (codePointsMatched < minLength) {
+                continue;
+            }
             if (wordCount < limit) {
                 if (values != NULL) {
                     values[wordCount] = bt.getValue();
