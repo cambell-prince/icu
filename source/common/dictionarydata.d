@@ -5,6 +5,7 @@ dictionarydata.o dictionarydata.d : dictionarydata.cpp dictionarydata.h unicode/
  unicode/uobject.h unicode/unistr.h unicode/std_string.h \
  unicode/stringpiece.h unicode/bytestream.h unicode/ucasemap.h \
  unicode/ustring.h unicode/putil.h unicode/uiter.h unicode/chariter.h \
- unicode/udata.h udataswp.h unicode/uobject.h unicode/ustringtrie.h \
- unicode/ucharstrie.h unicode/ustringtrie.h unicode/bytestrie.h cmemory.h \
- unicode/localpointer.h
+ unicode/udata.h udataswp.h unicode/uniset.h unicode/unifilt.h \
+ unicode/unifunct.h unicode/unimatch.h unicode/uset.h unicode/uobject.h \
+ unicode/ustringtrie.h unicode/ucharstrie.h unicode/ustringtrie.h \
+ unicode/bytestrie.h cmemory.h unicode/localpointer.h

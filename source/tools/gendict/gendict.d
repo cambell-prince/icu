@@ -25,9 +25,9 @@ gendict.o gendict.d : gendict.cpp ../../common/unicode/utypes.h \
  ../../common/cmemory.h ../../common/unicode/localpointer.h \
  ../../common/dictionarydata.h ../../common/unicode/utext.h \
  ../../common/unicode/chariter.h ../../common/unicode/udata.h \
- ../../common/udataswp.h ../../common/unicode/ustringtrie.h \
- ../toolutil/uoptions.h ../toolutil/unewdata.h ../../common/cmemory.h \
- ../../common/uassert.h ../toolutil/ucbuf.h ../toolutil/filestrm.h \
- ../toolutil/toolutil.h ../../common/unicode/errorcode.h \
- ../../common/cstring.h ../../common/putilimp.h \
- ../../common/unicode/putil.h
+ ../../common/udataswp.h ../../common/unicode/uniset.h \
+ ../../common/unicode/ustringtrie.h ../toolutil/uoptions.h \
+ ../toolutil/unewdata.h ../../common/cmemory.h ../../common/uassert.h \
+ ../toolutil/ucbuf.h ../toolutil/filestrm.h ../toolutil/toolutil.h \
+ ../../common/unicode/errorcode.h ../../common/cstring.h \
+ ../../common/putilimp.h ../../common/unicode/putil.h

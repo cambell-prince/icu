@@ -40,6 +40,6 @@ swapimpl.o swapimpl.d : swapimpl.cpp ../../common/unicode/utypes.h \
  ../../common/unicode/uchar.h ../../common/uprops.h \
  ../../common/rbbidata.h ../../common/utrie2.h \
  ../../common/dictionarydata.h ../../common/unicode/utext.h \
- ../../common/unicode/chariter.h ../../common/unicode/ustringtrie.h \
- ../../i18n/uspoof_impl.h ../../i18n/unicode/uspoof.h \
- ../../common/unicode/uscript.h
+ ../../common/unicode/chariter.h ../../common/unicode/uniset.h \
+ ../../common/unicode/ustringtrie.h ../../i18n/uspoof_impl.h \
+ ../../i18n/unicode/uspoof.h ../../common/unicode/uscript.h

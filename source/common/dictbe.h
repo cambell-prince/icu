@@ -329,6 +329,7 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   const int32_t ZWSP = 0x200B;
 
   bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
+  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const;
  
  public: 
  

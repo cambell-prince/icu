@@ -848,7 +848,7 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
     : DictionaryBreakEngine((1 << UBRK_WORD) | (1 << UBRK_LINE)),
       fDictionary(adoptDictionary)
 {
-    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]\\u200B\\u2060]"), status);
+    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]\\u2060]"), status);
     if (U_SUCCESS(status)) {
         setCharacters(fKhmerWordSet);
     }
@@ -868,7 +868,7 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 //    fSuffixSet.add(THAI_PAIYANNOI);
 //    fSuffixSet.add(THAI_MAIYAMOK);
     fIgnoreSet.add(0x2060); // WJ
-    fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]&[:^M:]]"), status);
+    fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:^M:]]"), status);
     
     // Compact for caching.
     fMarkSet.compact();
@@ -898,24 +898,25 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     PossibleWord words[KHMER_LOOKAHEAD];
     int32_t before = 0;
     int32_t after = 0;
-    int32_t nextAfter = 0;
     int32_t scanStart = rangeStart;
     int32_t scanEnd = rangeEnd;
      
     if (rangeStart > 0) {
         scanStart = rangeStart - 1;
     }
-    if (utext_nativeLength(text) > rangeEnd) {
+    if (utext_nativeLength(text) >= rangeEnd) {
         scanEnd = rangeEnd + 1;
     }
 
     utext_setNativeIndex(text, rangeStart);
 
-    scanWJ(text, scanStart, scanEnd, before, nextAfter);
+    scanWJ(text, scanStart, scanEnd, before, after);
     while (U_SUCCESS(status) && (current = (int32_t)utext_getNativeIndex(text)) < rangeEnd) {
         cuWordLength = 0;
         cpWordLength = 0;
 
+        if (current > after)
+            scanWJ(text, scanStart, scanEnd, before, after);
 
         // Look for candidate words at the current position
         int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2);
@@ -923,14 +924,10 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         // If we found exactly one, use that
         if (candidates == 1) {
             int32_t endCandidate = utext_getNativeIndex(text);
-            if ((endCandidate < before || endCandidate >= nextAfter) && endCandidate >= after) {
+            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
                 cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
                 cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
                 wordsFound += 1;
-            }
-            if (endCandidate > before) {
-                after = nextAfter;
-                scanWJ(text, scanStart, scanEnd, before, nextAfter);
             }
         }
 
@@ -943,14 +940,8 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
             do {
                 int32_t wordsMatched = 1;
                 int32_t endCandidate = utext_getNativeIndex(text);
-                if ((endCandidate >= before && endCandidate < nextAfter) || endCandidate < after) {
+                if (wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
                     wordsMatched = 0;
-                }
-                if (endCandidate > before) {
-                    after = nextAfter;
-                    scanWJ(text, scanStart, scanEnd, before, nextAfter);
-                }
-                if (wordsMatched == 0) {
                     continue;
                 }
                 if (words[(wordsFound + 1) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2) > 0) {
@@ -977,12 +968,16 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                 }
             }
             while (words[wordsFound % KHMER_LOOKAHEAD].backUp(text));
+            // failed to find a suitable break so advance and try again
+            utext_next32(text);
+            continue;
 foundBest:
             cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
             cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
             wordsFound += 1;
         }
 
+#if 0
         // We come here after having either found a word or not. We look ahead to the
         // next word. If it's not a dictionary word, we will combine it with the word we
         // just found (if there is one), but only if the preceding word does not exceed
@@ -1033,13 +1028,11 @@ foundBest:
                 utext_setNativeIndex(text, current+cuWordLength);
             }
         }
+#else
+        utext_setNativeIndex(text, current+cuWordLength);
+#endif
 
         // Never stop before a combining mark.
-        int32_t currPos;
-        while ((currPos = (int32_t)utext_getNativeIndex(text)) < rangeEnd && fMarkSet.contains(utext_current32(text))) {
-            utext_next32(text);
-            cuWordLength += (int32_t)utext_getNativeIndex(text) - currPos;
-        }
 
         // Look ahead for possible suffixes if a dictionary word does not follow.
         // We do this in code rather than using a rule so that the heuristic
@@ -1081,6 +1074,11 @@ foundBest:
 
         // Did we find a word on this iteration? If so, push it on the break stack
         if (cuWordLength > 0) {
+            int32_t currPos;
+            while ((currPos = (int32_t)utext_getNativeIndex(text)) < rangeEnd && fMarkSet.contains(utext_current32(text))) {
+                utext_next32(text);
+                cuWordLength += (int32_t)utext_getNativeIndex(text) - currPos;
+            }
             foundBreaks.push((current+cuWordLength), status);
         } else {
             utext_next32(text);
@@ -1103,58 +1101,75 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
     int32_t nat = start;
     utext_setNativeIndex(ut, nat);
     bool foundFirst = true;
+    int32_t curr = start;
     while (nat < end)
     {
         UChar32 c = utext_current32(ut);
         if (c == ZWSP || c == WJ)
         {
-            if (c == ZWSP)
-                start = nat + 1; // only update pointer for ZWSP
+            curr = nat + 1;
             if (foundFirst)      // only scan backwards for first inhibitor
             {
                 before = nat - 1;
                 for (int i = 0; i < 3; ++i) // scan backwards 3 clusters
                 {
                     c = utext_previous32(ut);
-                    while (before > start && fMarkSet.contains(c))  // scan back across cluster marks
+                    while (before > start)
                     {
+                        if (!fMarkSet.contains(c)) {
+                            if (fBaseSet.contains(c)) {
+                                c = utext_previous32(ut);
+                                if (c != 0x17D2) {      // coeng preceding base. Treat sequence as a mark
+                                    utext_next32(ut);
+                                    c = utext_current32(ut);
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
                         --before;
                         c = utext_previous32(ut);
                     }
-                    if (!fBaseSet.contains(c) || before < start)    // not a cluster start so finish
-                    {
-                        ++before;                                   // bad char so break before char after
+                    if (!fBaseSet.contains(c) || before < start) {  // not a cluster start so finish
                         break;
                     }
                     --before;               // go round again
                 }                   // ignore hitting previous inhibitor since scanning for it should have found us!
+                ++before;           // counteract --before
             }
+            foundFirst = false;     // don't scan backwards if we go around again. Also marks found something
 
             after = nat + 1;        // now scan forwards
             utext_setNativeIndex(ut, nat);
+            utext_next32(ut);
+            c = utext_current32(ut);
             for (int i = 0; i < 3; ++i)     // scan forwards 3 clusters
             {
-                c = utext_next32(ut);
-                if (fBaseSet.contains(c))
-                {
-                    while (++after < end)
+                if (fBaseSet.contains(c)) {
+                    while (after < end)
                     {
-                        c = utext_next32(ut);
+                        ++after;
+                        utext_next32(ut);
+                        c = utext_current32(ut);
                         if (!fMarkSet.contains(c))
                             break;
+                        else if (c == 0x17D2) {     // handle coeng + base as mark
+                            ++after;
+                            utext_next32(ut);
+                            c = utext_current32(ut);
+                            if (!fBaseSet.contains(c))
+                                break;
+                        }
                     }
-                }
-                else
-                {
+                } else {
                     --after;        // bad char so break after char before it
                     break;
                 }
             }
             nat = after + 1;
             
-            if (c == ZWSP || c == WJ)       // did we hit another one?
-            {
-                foundFirst = false;         // don't scan backwards for before next time
+            if (c == ZWSP || c == WJ) {     // did we hit another one?
                 continue;
             }
             else
@@ -1167,14 +1182,22 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
 
     utext_close(ut);
 
-    if (nat > end)
-    {
+    if (nat >= end && foundFirst) {
         start = before = after = nat;
         return false;       // failed to find anything
+    }
+    else {
+        start = curr;
     }
     return true;            // yup hit one
 }
 
+bool KhmerBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const {
+    while (pos > after && scanWJ(text, start, end, before, after));
+    if (pos < before)
+        return false;
+    return true;
+}
 
 #if !UCONFIG_NO_NORMALIZATION
 /*
