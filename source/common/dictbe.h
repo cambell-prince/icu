@@ -325,13 +325,15 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
      * @internal 
      */ 
  
-  UnicodeSet                fKhmerWordSet; 
-  UnicodeSet                fEndWordSet; 
-  UnicodeSet                fBeginWordSet; 
-  UnicodeSet                fMarkSet; 
-  UnicodeSet                fBaseSet;
-  UnicodeSet                fIgnoreSet;
-  DictionaryMatcher  *fDictionary;
+  UnicodeSet         fKhmerWordSet; 
+  UnicodeSet         fEndWordSet; 
+  UnicodeSet         fBeginWordSet; 
+  UnicodeSet         fMarkSet; 
+  UnicodeSet         fBaseSet;
+  UnicodeSet         fIgnoreSet;
+  DictionaryMatcher *fDictionary;
+  
+  int32_t clusterLimit;
   
   const int32_t WJ   = 0x2060;
   const int32_t ZWSP = 0x200B;
