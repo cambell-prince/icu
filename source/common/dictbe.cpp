@@ -28,7 +28,9 @@ U_NAMESPACE_BEGIN
  */
 
 DictionaryBreakEngine::DictionaryBreakEngine(uint32_t breakTypes) {
+    UErrorCode status = U_ZERO_ERROR;
     fTypes = breakTypes;
+    fViramaSet.applyPattern(UNICODE_STRING_SIMPLE("[[:ccc=VR:]]"), status);
 }
 
 DictionaryBreakEngine::~DictionaryBreakEngine() {
@@ -971,14 +973,13 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
             }
             while (words[wordsFound % KHMER_LOOKAHEAD].backUp(text));
             // failed to find a suitable break so advance and try again
-            utext_next32(text);
-            continue;
+            goto doneBest;
 foundBest:
             cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
             cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
             wordsFound += 1;
         }
-
+doneBest:
 #if 0
         // We come here after having either found a word or not. We look ahead to the
         // next word. If it's not a dictionary word, we will combine it with the word we
@@ -1077,22 +1078,46 @@ foundBest:
         // Did we find a word on this iteration? If so, push it on the break stack
         if (cuWordLength > 0) {
             if (unknownStart >= 0) {
-                if (!wjinhibit(current - 1, text, scanStart, scanEnd, before, after)) {
-                    foundBreaks.push(current - 1, status);
+                if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
+                    foundBreaks.push(current, status);
                 }
                 unknownStart = -1;
             }
-            int32_t currPos;
-            while ((currPos = (int32_t)utext_getNativeIndex(text)) < rangeEnd && fMarkSet.contains(utext_current32(text))) {
+            // skip anything combining that follows on
+            int32_t currEnd = (int32_t)utext_getNativeIndex(text);
+            int32_t currPos = currEnd;
+            while (currPos  < rangeEnd) {
+                int32_t c = utext_current32(text);
+                if (!fMarkSet.contains(c))
+                    break;
+                if (fViramaSet.contains(c)) {
+                    utext_next32(text);
+                    ++currPos;
+                }
                 utext_next32(text);
-                cuWordLength += (int32_t)utext_getNativeIndex(text) - currPos;
+                ++currPos;
             }
+            cuWordLength += currPos - currEnd;
             foundBreaks.push((current+cuWordLength), status);
         } else {
+            int32_t currPos = utext_getNativeIndex(text);
             if (unknownStart < 0) {
-                unknownStart = (int32_t)utext_getNativeIndex(text);
+                unknownStart = currPos;
             }
-            utext_next32(text);
+            while (currPos < rangeEnd) {
+                int32_t c;
+                utext_next32(text);
+                currPos++;
+                c = utext_current32(text);
+                if (fViramaSet.contains(c)) {
+                    utext_next32(text);
+                    utext_next32(text);
+                    currPos += 2;
+                    c = utext_current32(text);
+                }
+                if (fBeginWordSet.contains(c))
+                    break;
+            }
         }
     }
     
@@ -1130,7 +1155,7 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
                         if (!fMarkSet.contains(c)) {
                             if (fBaseSet.contains(c)) {
                                 c = utext_previous32(ut);
-                                if (c != 0x17D2) {      // coeng preceding base. Treat sequence as a mark
+                                if (!fViramaSet.contains(c)) {      // coeng preceding base. Treat sequence as a mark
                                     utext_next32(ut);
                                     c = utext_current32(ut);
                                     break;
@@ -1165,7 +1190,7 @@ KhmerBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t &befo
                         c = utext_current32(ut);
                         if (!fMarkSet.contains(c))
                             break;
-                        else if (c == 0x17D2) {     // handle coeng + base as mark
+                        else if (fViramaSet.contains(c)) {     // handle coeng + base as mark
                             ++after;
                             utext_next32(ut);
                             c = utext_current32(ut);

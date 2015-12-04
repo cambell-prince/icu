@@ -52,6 +52,14 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
    */
   DictionaryBreakEngine();
 
+ protected:
+    /**
+     * A Unicode set of all viramas
+     * @internal
+     */
+
+  UnicodeSet    fViramaSet;
+
  public:
 
   /**
