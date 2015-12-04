@@ -894,7 +894,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     }
 
     uint32_t wordsFound = 0;
-    int32_t cpWordLength = 0;
     int32_t cuWordLength = 0;
     int32_t current;
     UErrorCode status = U_ZERO_ERROR;
@@ -970,7 +969,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
 foundBest:
             cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
             cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
-            wordsFound += 1;
+            ++wordsFound;
         }
 doneBest:
         utext_setNativeIndex(text, current+cuWordLength);
@@ -981,7 +980,6 @@ doneBest:
                 // TODO We could also not add the break if cuWordLength or or unknownLength < KHMER_ROOT_COMBINE_THRESHOLD
                 if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
                     foundBreaks.push(current, status);
-                    ++wordsFound;
                 }
                 unknownStart = -1;
             }
@@ -1003,8 +1001,6 @@ doneBest:
             if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
                 foundBreaks.push(endCandidate, status);
             }
-            else
-                --wordsFound;
         } else {
             int32_t currPos = utext_getNativeIndex(text);
             if (unknownStart < 0) {
@@ -1030,10 +1026,8 @@ doneBest:
     // Don't return a break for the end of the dictionary range if there is one there.
     if (foundBreaks.peeki() >= rangeEnd) {
         (void) foundBreaks.popi();
-        wordsFound -= 1;
     }
-
-    return wordsFound;
+    return foundBreaks.size();
 }
 
 bool
