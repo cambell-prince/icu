@@ -917,7 +917,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     scanWJ(text, scanStart, scanEnd, before, after);
     while (U_SUCCESS(status) && (current = (int32_t)utext_getNativeIndex(text)) < rangeEnd) {
         cuWordLength = 0;
-        cpWordLength = 0;
 
         if (current > after)
             scanWJ(text, scanStart, scanEnd, before, after);
@@ -928,7 +927,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         // If we found exactly one, use that
         if (candidates == 1) {
             cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-            cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
             wordsFound += 1;
         }
 
@@ -968,7 +966,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
             goto doneBest;
 foundBest:
             cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-            cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
             ++wordsFound;
         }
 doneBest:
