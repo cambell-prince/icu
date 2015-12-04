@@ -900,6 +900,8 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     int32_t after = 0;
     int32_t scanStart = rangeStart;
     int32_t scanEnd = rangeEnd;
+    
+    int32_t unknownStart = -1;
      
     if (rangeStart > 0) {
         scanStart = rangeStart - 1;
@@ -1074,6 +1076,12 @@ foundBest:
 
         // Did we find a word on this iteration? If so, push it on the break stack
         if (cuWordLength > 0) {
+            if (unknownStart >= 0) {
+                if (!wjinhibit(current - 1, text, scanStart, scanEnd, before, after)) {
+                    foundBreaks.push(current - 1, status);
+                }
+                unknownStart = -1;
+            }
             int32_t currPos;
             while ((currPos = (int32_t)utext_getNativeIndex(text)) < rangeEnd && fMarkSet.contains(utext_current32(text))) {
                 utext_next32(text);
@@ -1081,6 +1089,9 @@ foundBest:
             }
             foundBreaks.push((current+cuWordLength), status);
         } else {
+            if (unknownStart < 0) {
+                unknownStart = (int32_t)utext_getNativeIndex(text);
+            }
             utext_next32(text);
         }
     }
