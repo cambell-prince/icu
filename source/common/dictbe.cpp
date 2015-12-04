@@ -927,12 +927,9 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
 
         // If we found exactly one, use that
         if (candidates == 1) {
-            int32_t endCandidate = utext_getNativeIndex(text);
-            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
-                cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-                cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
-                wordsFound += 1;
-            }
+            cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
+            cpWordLength = words[wordsFound % KHMER_LOOKAHEAD].markedCPLength();
+            wordsFound += 1;
         }
 
         // If there was more than one, see which one can take us forward the most words
@@ -943,11 +940,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
             }
             do {
                 int32_t wordsMatched = 1;
-                int32_t endCandidate = utext_getNativeIndex(text);
-                if (wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
-                    wordsMatched = 0;
-                    continue;
-                }
                 if (words[(wordsFound + 1) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2) > 0) {
                     if (wordsMatched < 2) {
                         // Followed by another dictionary word; mark first word as a good candidate
@@ -1080,12 +1072,13 @@ doneBest:
             if (unknownStart >= 0) {
                 if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
                     foundBreaks.push(current, status);
+                    ++wordsFound;
                 }
                 unknownStart = -1;
             }
             // skip anything combining that follows on
-            int32_t currEnd = (int32_t)utext_getNativeIndex(text);
-            int32_t currPos = currEnd;
+            int32_t currPos = (int32_t)utext_getNativeIndex(text);
+            int32_t currEnd = currPos;
             while (currPos  < rangeEnd) {
                 int32_t c = utext_current32(text);
                 if (!fMarkSet.contains(c))
@@ -1097,8 +1090,12 @@ doneBest:
                 utext_next32(text);
                 ++currPos;
             }
-            cuWordLength += currPos - currEnd;
-            foundBreaks.push((current+cuWordLength), status);
+            int32_t endCandidate = current + cuWordLength + currPos - currEnd;
+            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
+                foundBreaks.push(endCandidate, status);
+            }
+            else
+                --wordsFound;
         } else {
             int32_t currPos = utext_getNativeIndex(text);
             if (unknownStart < 0) {
