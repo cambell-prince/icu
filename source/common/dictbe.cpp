@@ -966,15 +966,8 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
     }
     fMarkSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]&[:M:]]"), status);
     fMarkSet.add(0x0020);
-    fEndWordSet = fKhmerWordSet;
     fBeginWordSet.add(0x1780, 0x17B3);
-    //fBeginWordSet.add(0x17A3, 0x17A4);      // deprecated vowels
-    //fEndWordSet.remove(0x17A5, 0x17A9);     // Khmer independent vowels that can't end a word
-    //fEndWordSet.remove(0x17B2);             // Khmer independent vowel that can't end a word
-    fEndWordSet.remove(0x17D2);             // KHMER SIGN COENG that combines some following characters
-    //fEndWordSet.remove(0x17B6, 0x17C5);     // Remove dependent vowels
-//    fEndWordSet.remove(0x0E31);             // MAI HAN-AKAT
-//    fEndWordSet.remove(0x0E40, 0x0E44);     // SARA E through SARA AI MAIMALAI
+//    fBeginWordSet.add(0x17A3, 0x17A4);      // deprecated vowels
 //    fBeginWordSet.add(0x0E01, 0x0E2E);      // KO KAI through HO NOKHUK
 //    fBeginWordSet.add(0x0E40, 0x0E44);      // SARA E through SARA AI MAIMALAI
 //    fSuffixSet.add(THAI_PAIYANNOI);
@@ -984,7 +977,6 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 
     // Compact for caching.
     fMarkSet.compact();
-    fEndWordSet.compact();
     fBeginWordSet.compact();
 //    fSuffixSet.compact();
 }

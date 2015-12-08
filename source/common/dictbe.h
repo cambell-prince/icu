@@ -356,7 +356,7 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
      */
 
   UnicodeSet         fKhmerWordSet;
-  UnicodeSet         fEndWordSet;
+  //UnicodeSet         fEndWordSet;
   UnicodeSet         fBeginWordSet;
   DictionaryMatcher *fDictionary;
 
