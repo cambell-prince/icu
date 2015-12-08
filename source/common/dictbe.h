@@ -46,6 +46,9 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
 
   uint32_t      fTypes;
 
+  const int32_t WJ   = 0x2060;
+  const int32_t ZWSP = 0x200B;
+
   /**
    * <p>Default constructor.</p>
    *
@@ -53,12 +56,39 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   DictionaryBreakEngine();
 
  protected:
-    /**
-     * A Unicode set of all viramas
-     * @internal
-     */
 
+  /**
+   * A Unicode set of all viramas
+   * @internal
+   */
   UnicodeSet    fViramaSet;
+
+  /**
+   * A Unicode set of all base characters
+   * @internal
+   */
+  UnicodeSet    fBaseSet;
+
+  /**
+   * A Unicode set of all marks
+   * @internal
+   */
+  UnicodeSet    fMarkSet;
+
+  /**
+   * A Unicode set of all characters ignored ignored in dictionary matching
+   * @internal
+   */
+  UnicodeSet    fIgnoreSet;
+
+  /**
+   * The number of clusters within which breaks are inhibited
+   * @internal
+   */
+  int32_t clusterLimit;
+
+  bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
+  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const;
 
  public:
 
@@ -89,7 +119,7 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
    * <p>Find any breaks within a run in the supplied text.</p>
    *
    * @param text A UText representing the text. The iterator is left at
-   * the end of the run of characters which the engine is capable of handling 
+   * the end of the run of characters which the engine is capable of handling
    * that starts from the first (or last) character in the range.
    * @param startPos The start of the run within the supplied text.
    * @param endPos The end of the run within the supplied text.
@@ -251,128 +281,117 @@ class LaoBreakEngine : public DictionaryBreakEngine {
 
 };
 
-/******************************************************************* 
- * BurmeseBreakEngine 
- */ 
- 
-/** 
- * <p>BurmeseBreakEngine is a kind of DictionaryBreakEngine that uses a 
- * DictionaryMatcher and heuristics to determine Burmese-specific breaks.</p> 
- * 
- * <p>After it is constructed a BurmeseBreakEngine may be shared between 
- * threads without synchronization.</p> 
- */ 
-class BurmeseBreakEngine : public DictionaryBreakEngine { 
- private: 
-    /** 
-     * The set of characters handled by this engine 
-     * @internal 
-     */ 
- 
-  UnicodeSet                fBurmeseWordSet; 
-  UnicodeSet                fEndWordSet; 
-  UnicodeSet                fBeginWordSet; 
-  UnicodeSet                fMarkSet; 
-  DictionaryMatcher  *fDictionary; 
- 
- public: 
- 
-  /** 
-   * <p>Default constructor.</p> 
-   * 
-   * @param adoptDictionary A DictionaryMatcher to adopt. Deleted when the 
-   * engine is deleted. 
-   */ 
-  BurmeseBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCode &status); 
- 
-  /** 
-   * <p>Virtual destructor.</p> 
-   */ 
-  virtual ~BurmeseBreakEngine(); 
- 
- protected: 
- /** 
-  * <p>Divide up a range of known dictionary characters.</p> 
-  * 
-  * @param text A UText representing the text 
-  * @param rangeStart The start of the range of dictionary characters 
-  * @param rangeEnd The end of the range of dictionary characters 
-  * @param foundBreaks Output of C array of int32_t break positions, or 0 
-  * @return The number of breaks found 
-  */ 
-  virtual int32_t divideUpDictionaryRange( UText *text, 
-                                           int32_t rangeStart, 
-                                           int32_t rangeEnd, 
-                                           UStack &foundBreaks ) const; 
- 
-}; 
- 
-/******************************************************************* 
- * KhmerBreakEngine 
- */ 
- 
-/** 
- * <p>KhmerBreakEngine is a kind of DictionaryBreakEngine that uses a 
- * DictionaryMatcher and heuristics to determine Khmer-specific breaks.</p> 
- * 
- * <p>After it is constructed a KhmerBreakEngine may be shared between 
- * threads without synchronization.</p> 
- */ 
-class KhmerBreakEngine : public DictionaryBreakEngine { 
- private: 
-    /** 
-     * The set of characters handled by this engine 
-     * @internal 
-     */ 
- 
-  UnicodeSet         fKhmerWordSet; 
-  UnicodeSet         fEndWordSet; 
-  UnicodeSet         fBeginWordSet; 
-  UnicodeSet         fMarkSet; 
-  UnicodeSet         fBaseSet;
-  UnicodeSet         fIgnoreSet;
-  DictionaryMatcher *fDictionary;
-  
-  int32_t clusterLimit;
-  
-  const int32_t WJ   = 0x2060;
-  const int32_t ZWSP = 0x200B;
+/*******************************************************************
+ * BurmeseBreakEngine
+ */
 
-  bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
-  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const;
- 
- public: 
- 
-  /** 
-   * <p>Default constructor.</p> 
-   * 
-   * @param adoptDictionary A DictionaryMatcher to adopt. Deleted when the 
-   * engine is deleted. 
-   */ 
-  KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCode &status); 
- 
-  /** 
-   * <p>Virtual destructor.</p> 
-   */ 
-  virtual ~KhmerBreakEngine(); 
- 
- protected: 
- /** 
-  * <p>Divide up a range of known dictionary characters.</p> 
-  * 
-  * @param text A UText representing the text 
-  * @param rangeStart The start of the range of dictionary characters 
-  * @param rangeEnd The end of the range of dictionary characters 
-  * @param foundBreaks Output of C array of int32_t break positions, or 0 
-  * @return The number of breaks found 
-  */ 
-  virtual int32_t divideUpDictionaryRange( UText *text, 
-                                           int32_t rangeStart, 
-                                           int32_t rangeEnd, 
-                                           UStack &foundBreaks ) const; 
- 
-}; 
- 
+/**
+ * <p>BurmeseBreakEngine is a kind of DictionaryBreakEngine that uses a
+ * DictionaryMatcher and heuristics to determine Burmese-specific breaks.</p>
+ *
+ * <p>After it is constructed a BurmeseBreakEngine may be shared between
+ * threads without synchronization.</p>
+ */
+class BurmeseBreakEngine : public DictionaryBreakEngine {
+ private:
+    /**
+     * The set of characters handled by this engine
+     * @internal
+     */
+
+  UnicodeSet                fBurmeseWordSet;
+  UnicodeSet                fEndWordSet;
+  UnicodeSet                fBeginWordSet;
+  UnicodeSet                fMarkSet;
+  DictionaryMatcher  *fDictionary;
+
+ public:
+
+  /**
+   * <p>Default constructor.</p>
+   *
+   * @param adoptDictionary A DictionaryMatcher to adopt. Deleted when the
+   * engine is deleted.
+   */
+  BurmeseBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCode &status);
+
+  /**
+   * <p>Virtual destructor.</p>
+   */
+  virtual ~BurmeseBreakEngine();
+
+ protected:
+ /**
+  * <p>Divide up a range of known dictionary characters.</p>
+  *
+  * @param text A UText representing the text
+  * @param rangeStart The start of the range of dictionary characters
+  * @param rangeEnd The end of the range of dictionary characters
+  * @param foundBreaks Output of C array of int32_t break positions, or 0
+  * @return The number of breaks found
+  */
+  virtual int32_t divideUpDictionaryRange( UText *text,
+                                           int32_t rangeStart,
+                                           int32_t rangeEnd,
+                                           UStack &foundBreaks ) const;
+
+};
+
+/*******************************************************************
+ * KhmerBreakEngine
+ */
+
+/**
+ * <p>KhmerBreakEngine is a kind of DictionaryBreakEngine that uses a
+ * DictionaryMatcher and heuristics to determine Khmer-specific breaks.</p>
+ *
+ * <p>After it is constructed a KhmerBreakEngine may be shared between
+ * threads without synchronization.</p>
+ */
+class KhmerBreakEngine : public DictionaryBreakEngine {
+ private:
+    /**
+     * The set of characters handled by this engine
+     * @internal
+     */
+
+  UnicodeSet         fKhmerWordSet;
+  UnicodeSet         fEndWordSet;
+  UnicodeSet         fBeginWordSet;
+  DictionaryMatcher *fDictionary;
+
+ public:
+
+  /**
+   * <p>Default constructor.</p>
+   *
+   * @param adoptDictionary A DictionaryMatcher to adopt. Deleted when the
+   * engine is deleted.
+   */
+  KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCode &status);
+
+  /**
+   * <p>Virtual destructor.</p>
+   */
+  virtual ~KhmerBreakEngine();
+
+ protected:
+ /**
+  * <p>Divide up a range of known dictionary characters.</p>
+  *
+  * @param text A UText representing the text
+  * @param rangeStart The start of the range of dictionary characters
+  * @param rangeEnd The end of the range of dictionary characters
+  * @param foundBreaks Output of C array of int32_t break positions, or 0
+  * @return The number of breaks found
+  */
+  virtual int32_t divideUpDictionaryRange( UText *text,
+                                           int32_t rangeStart,
+                                           int32_t rangeEnd,
+                                           UStack &foundBreaks ) const;
+
+};
+
 #if !UCONFIG_NO_NORMALIZATION
 
 /*******************************************************************
