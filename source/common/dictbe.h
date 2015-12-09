@@ -82,6 +82,18 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   UnicodeSet    fIgnoreSet;
 
   /**
+   * A Unicode set of all characters ignored ignored in dictionary matching
+   * @internal
+   */
+  UnicodeSet    fSkipStartSet;
+
+  /**
+   * A Unicode set of all characters ignored ignored in dictionary matching
+   * @internal
+   */
+  UnicodeSet    fSkipEndSet;
+
+  /**
    * The number of clusters within which breaks are inhibited
    * @internal
    */
@@ -89,6 +101,9 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
 
   bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
   bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const;
+
+  void scanBeforeStart(UText *text, int32_t& start) const;
+  void scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end) const;
 
  public:
 

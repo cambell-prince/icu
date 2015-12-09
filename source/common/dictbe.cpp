@@ -33,6 +33,9 @@ DictionaryBreakEngine::DictionaryBreakEngine(uint32_t breakTypes) :
     UErrorCode status = U_ZERO_ERROR;
     fTypes = breakTypes;
     fViramaSet.applyPattern(UNICODE_STRING_SIMPLE("[[:ccc=VR:]]"), status);
+
+    fSkipStartSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=OP:][:lb=QU:]]"), status);
+    fSkipEndSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=CP:][:lb=QU:][:lb=EX:]]"), status);
 }
 
 DictionaryBreakEngine::~DictionaryBreakEngine() {
@@ -103,6 +106,38 @@ DictionaryBreakEngine::setCharacters( const UnicodeSet &set ) {
     fSet = set;
     // Compact for caching
     fSet.compact();
+}
+
+void
+DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start) const {
+    UErrorCode status = U_ZERO_ERROR;
+    UText* ut = utext_clone(NULL, text, false, true, &status);
+    utext_setNativeIndex(ut, start);
+    UChar32 c = utext_current32(ut);
+    while (start > 0) {
+        if (!fSkipStartSet.contains(c)) {
+            break;
+        }
+        --start;
+        c = utext_previous32(ut);
+    }
+    utext_close(ut);
+}
+
+void
+DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end) const {
+    UErrorCode status = U_ZERO_ERROR;
+    UText* ut = utext_clone(NULL, text, false, true, &status);
+    utext_setNativeIndex(ut, end);
+    UChar32 c = utext_current32(ut);
+    while (end < textEnd) {
+        if (!fSkipEndSet.contains(c)) {
+            break;
+        }
+        ++end;
+        c = utext_next32(ut);
+    }
+    utext_close(ut);
 }
 
 bool
@@ -1006,12 +1041,8 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
 
     int32_t unknownStart = -1;
 
-    if (rangeStart > 0) {
-        scanStart = rangeStart - 1;
-    }
-    if (utext_nativeLength(text) >= rangeEnd) {
-        scanEnd = rangeEnd + 1;
-    }
+    scanBeforeStart(text, scanStart);
+    scanAfterEnd(text, utext_nativeLength(text), scanEnd);
 
     utext_setNativeIndex(text, rangeStart);
 
@@ -1020,7 +1051,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         cuWordLength = 0;
 
         if (current > after)
-            scanWJ(text, scanStart, scanEnd, before, after);
+            scanWJ(text, current, scanEnd, before, after);
 
         // Look for candidate words at the current position
         int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2);
