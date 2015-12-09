@@ -168,6 +168,8 @@ DictionaryBreakEngine::scanBackClusters(UText *text, int32_t textStart, int32_t&
                         c = utext_current32(text);
                         break;
                     }
+                    else
+                        --start;
                 } else {
                     break;
                 }
@@ -186,14 +188,14 @@ DictionaryBreakEngine::scanBackClusters(UText *text, int32_t textStart, int32_t&
 
 void
 DictionaryBreakEngine::scanFwdClusters(UText *text, int32_t textEnd, int32_t& end) const {
-    UChar32 c = 0;
+    UChar32 c = utext_current32(text);
     end = utext_getNativeIndex(text);
     while (end < textEnd) {
+        if (!fSkipStartSet.contains(c))
+            break;
         utext_next32(text);
         c = utext_current32(text);
         ++end;
-        if (!fSkipStartSet.contains(c))
-            break;
     }
     for (int i = 0; i < clusterLimit; ++i)  // scan forwards clusterLimit clusters
     {
@@ -238,6 +240,7 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
                 scanBackClusters(ut, start, before);
             foundFirst = false;     // don't scan backwards if we go around again. Also marks found something
 
+            utext_next32(ut);
             scanFwdClusters(ut, end, after);
             nat = after + 1;
 
@@ -1071,10 +1074,16 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     int32_t scanEnd = rangeEnd;
 
     int32_t unknownStart = -1;
+    bool startZwsp = false;
 
-    bool startZwsp = scanBeforeStart(text, scanStart);
+    if (rangeStart > 0) {
+        utext_setNativeIndex(text, rangeStart - 1);
+        startZwsp = scanBeforeStart(text, scanStart);
+    }
+    utext_setNativeIndex(text, rangeStart);
     scanFwdClusters(text, rangeEnd, initAfter);
     bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd);
+    utext_setNativeIndex(text, rangeEnd - 1);
     scanBackClusters(text, rangeStart, finalBefore);
 
     scanWJ(text, rangeStart, rangeEnd, before, after);

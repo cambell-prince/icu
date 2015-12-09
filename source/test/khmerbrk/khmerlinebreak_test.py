@@ -4,10 +4,11 @@ import unittest
 
 from iculibrary import IcuLibrary, rbbi
 from ctypes import byref
+import os
 
 class TestKhmerBreaking(unittest.TestCase):
     def setUp(self):
-        self.icu56 = IcuLibrary('/hdd2/src/libo/src/workdir/UnpackedTarball/icu/source/lib', '56')
+        self.icu56 = IcuLibrary(os.path.join(os.path.dirname(__file__), '../../lib'), '56')
         self.rbbi56 = rbbi(self.icu56, locale='km_KH')
         self.icu52 = IcuLibrary('/usr/lib/x86_64-linux-gnu', '52')
         self.rbbi52 = rbbi(self.icu52, locale='km_KH')
@@ -45,3 +46,7 @@ class TestKhmerBreaking(unittest.TestCase):
         result = self.break56(s)
         self.assertEqual(s, result)
         assert True == True, 'not really'
+
+if __name__ == '__main__' :
+    unittest.main()
+
