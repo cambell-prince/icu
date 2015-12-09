@@ -100,10 +100,13 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   int32_t clusterLimit;
 
   bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
-  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const;
+  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
+                 int32_t before, int32_t after, int32_t finalBefore, bool endZwsp) const;
 
-  void scanBeforeStart(UText *text, int32_t& start) const;
-  void scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end) const;
+  bool scanBeforeStart(UText *text, int32_t& start) const;
+  bool scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end) const;
+  void scanBackClusters(UText *text, int32_t textStart, int32_t& start) const;
+  void scanFwdClusters(UText *text, int32_t textEnd, int32_t& end) const;
 
  public:
 

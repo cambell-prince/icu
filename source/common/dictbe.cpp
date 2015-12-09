@@ -108,36 +108,116 @@ DictionaryBreakEngine::setCharacters( const UnicodeSet &set ) {
     fSet.compact();
 }
 
-void
+bool
 DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start) const {
     UErrorCode status = U_ZERO_ERROR;
     UText* ut = utext_clone(NULL, text, false, true, &status);
     utext_setNativeIndex(ut, start);
     UChar32 c = utext_current32(ut);
+    bool res = false;
     while (start > 0) {
         if (!fSkipStartSet.contains(c)) {
+            res = (c == ZWSP);
             break;
         }
         --start;
         c = utext_previous32(ut);
     }
     utext_close(ut);
+    return res;
 }
 
-void
+bool
 DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end) const {
     UErrorCode status = U_ZERO_ERROR;
     UText* ut = utext_clone(NULL, text, false, true, &status);
     utext_setNativeIndex(ut, end);
     UChar32 c = utext_current32(ut);
+    bool res = false;
     while (end < textEnd) {
         if (!fSkipEndSet.contains(c)) {
+            res = (c == ZWSP);
             break;
         }
         ++end;
         c = utext_next32(ut);
     }
     utext_close(ut);
+    return res;
+}
+
+void
+DictionaryBreakEngine::scanBackClusters(UText *text, int32_t textStart, int32_t& start) const {
+    UChar32 c = 0;
+    start = utext_getNativeIndex(text);
+    while (start > textStart) {
+        c = utext_previous32(text);
+        --start;
+        if (!fSkipEndSet.contains(c))
+            break;
+    }
+    for (int i = 0; i < clusterLimit; ++i) // scan backwards clusterLimit clusters
+    {
+        while (start > textStart)
+        {
+            if (!fMarkSet.contains(c)) {
+                if (fBaseSet.contains(c)) {
+                    c = utext_previous32(text);
+                    if (!fViramaSet.contains(c)) { // Virama (e.g. coeng) preceding base. Treat sequence as a mark
+                        utext_next32(text);
+                        c = utext_current32(text);
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+            c = utext_previous32(text);
+            --start;
+        }
+        if (!fBaseSet.contains(c) || start < textStart) {  // not a cluster start so finish
+            break;
+        }
+        c = utext_previous32(text);
+        --start;        // go round again
+    }                   // ignore hitting previous inhibitor since scanning for it should have found us!
+    ++start;            // counteract --before
+}
+
+void
+DictionaryBreakEngine::scanFwdClusters(UText *text, int32_t textEnd, int32_t& end) const {
+    UChar32 c = 0;
+    end = utext_getNativeIndex(text);
+    while (end < textEnd) {
+        utext_next32(text);
+        c = utext_current32(text);
+        ++end;
+        if (!fSkipStartSet.contains(c))
+            break;
+    }
+    for (int i = 0; i < clusterLimit; ++i)  // scan forwards clusterLimit clusters
+    {
+        if (fBaseSet.contains(c)) {
+            while (end < textEnd)
+            {
+                utext_next32(text);
+                c = utext_current32(text);
+                ++end;
+                if (!fMarkSet.contains(c))
+                    break;
+                else if (fViramaSet.contains(c)) {  // handle coeng + base as mark
+                    utext_next32(text);
+                    c = utext_current32(text);
+                    ++end;
+                    if (!fBaseSet.contains(c))
+                        break;
+                }
+            }
+        } else {
+            --end;    // bad char so break after char before it
+            break;
+        }
+    }
 }
 
 bool
@@ -155,64 +235,10 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
         {
             curr = nat + 1;
             if (foundFirst) // only scan backwards for first inhibitor
-            {
-                before = nat - 1;
-                for (int i = 0; i < clusterLimit; ++i) // scan backwards clusterLimit clusters
-                {
-                    c = utext_previous32(ut);
-                    while (before > start)
-                    {
-                        if (!fMarkSet.contains(c)) {
-                            if (fBaseSet.contains(c)) {
-                                c = utext_previous32(ut);
-                                if (!fViramaSet.contains(c)) { // Virama (e.g. coeng) preceding base. Treat sequence as a mark
-                                    utext_next32(ut);
-                                    c = utext_current32(ut);
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        --before;
-                        c = utext_previous32(ut);
-                    }
-                    if (!fBaseSet.contains(c) || before < start) {  // not a cluster start so finish
-                        break;
-                    }
-                    --before;       // go round again
-                }                   // ignore hitting previous inhibitor since scanning for it should have found us!
-                ++before;           // counteract --before
-            }
+                scanBackClusters(ut, start, before);
             foundFirst = false;     // don't scan backwards if we go around again. Also marks found something
 
-            after = nat + 1;        // now scan forwards
-            utext_setNativeIndex(ut, nat);
-            utext_next32(ut);
-            c = utext_current32(ut);
-            for (int i = 0; i < clusterLimit; ++i)  // scan forwards clusterLimit clusters
-            {
-                if (fBaseSet.contains(c)) {
-                    while (after < end)
-                    {
-                        ++after;
-                        utext_next32(ut);
-                        c = utext_current32(ut);
-                        if (!fMarkSet.contains(c))
-                            break;
-                        else if (fViramaSet.contains(c)) {  // handle coeng + base as mark
-                            ++after;
-                            utext_next32(ut);
-                            c = utext_current32(ut);
-                            if (!fBaseSet.contains(c))
-                                break;
-                        }
-                    }
-                } else {
-                    --after;    // bad char so break after char before it
-                    break;
-                }
-            }
+            scanFwdClusters(ut, end, after);
             nat = after + 1;
 
             if (c == ZWSP || c == WJ) {  // did we hit another one?
@@ -238,9 +264,12 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
     return true;                // yup hit one
 }
 
-bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end, int32_t before, int32_t after) const {
+bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
+                                      int32_t before, int32_t after, int32_t finalBefore, bool endZwsp) const {
     while (pos > after && scanWJ(text, start, end, before, after));
-    if (pos < before)
+    if (!endZwsp && after >= end)
+        finalBefore = end;
+    if (pos < before || pos < finalBefore)
         return false;
     return true;
 }
@@ -1036,22 +1065,42 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     PossibleWord words[KHMER_LOOKAHEAD];
     int32_t before = 0;
     int32_t after = 0;
+    int32_t finalBefore = 0;
+    int32_t initAfter = 0;
     int32_t scanStart = rangeStart;
     int32_t scanEnd = rangeEnd;
 
     int32_t unknownStart = -1;
 
-    scanBeforeStart(text, scanStart);
-    scanAfterEnd(text, utext_nativeLength(text), scanEnd);
+    bool startZwsp = scanBeforeStart(text, scanStart);
+    scanFwdClusters(text, rangeEnd, initAfter);
+    bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd);
+    scanBackClusters(text, rangeStart, finalBefore);
+
+    scanWJ(text, rangeStart, rangeEnd, before, after);
+    if (startZwsp || initAfter >= before || initAfter >= finalBefore)
+        after = initAfter;
+    if (!endZwsp && after > finalBefore && after < rangeEnd)
+        endZwsp = true;
+    if (endZwsp && before > finalBefore)
+        before = finalBefore;
 
     utext_setNativeIndex(text, rangeStart);
 
-    scanWJ(text, scanStart, scanEnd, before, after);
     while (U_SUCCESS(status) && (current = (int32_t)utext_getNativeIndex(text)) < rangeEnd) {
         cuWordLength = 0;
 
-        if (current > after)
+        if (current > after) {
             scanWJ(text, current, scanEnd, before, after);
+            if (!endZwsp) {
+                if (after >= scanEnd)
+                    finalBefore = scanEnd;  // no way back from here
+                else if (after > finalBefore)
+                    endZwsp = true;
+            }
+            if (endZwsp && before > finalBefore)
+                before = finalBefore;
+        }
 
         // Look for candidate words at the current position
         int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2);
@@ -1107,7 +1156,7 @@ doneBest:
         if (cuWordLength > 0) {
             if (unknownStart >= 0) {
                 // TODO We could also not add the break if cuWordLength or or unknownLength < KHMER_ROOT_COMBINE_THRESHOLD
-                if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
+                if (!wjinhibit(current, text, scanStart, scanEnd, before, after, finalBefore, endZwsp)) {
                     foundBreaks.push(current, status);
                 }
                 unknownStart = -1;
@@ -1127,7 +1176,7 @@ doneBest:
                 ++currPos;
             }
             int32_t endCandidate = current + cuWordLength + currPos - currEnd;
-            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
+            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after, finalBefore, endZwsp)) {
                 foundBreaks.push(endCandidate, status);
             }
         } else {
