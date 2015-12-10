@@ -268,11 +268,9 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
 }
 
 bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
-                                      int32_t before, int32_t after, int32_t finalBefore, bool endZwsp) const {
+                                      int32_t before, int32_t after) const {
     while (pos > after && scanWJ(text, start, end, before, after));
-//    if (!endZwsp && after >= end)
-//        finalBefore = end;
-    if (pos < before) // || pos < finalBefore)
+    if (pos < before)
         return false;
     return true;
 }
@@ -1041,6 +1039,8 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 //    fSuffixSet.add(THAI_MAIYAMOK);
     fIgnoreSet.add(0x2060); // WJ
     fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:^M:]]"), status);
+    fPuncSet.applyPattern(UNICODE_STRING_SIMPLE("[\\u17D4\\u17D5\\u17D6\\u17D7\\u17D9:]"), status);
+    fKhmerWordSet.addAll(fPuncSet);
 
     // Compact for caching.
     fMarkSet.compact();
@@ -1128,7 +1128,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         // If there was more than one, see which one can take us forward the most words
         else if (candidates > 1) {
             // If we're already at the end of the range, we're done
-            if ((int32_t)utext_getNativeIndex(text) >= rangeEnd) {
+            if ((int32_t)utext_getNativeIndex(text) >= rangeEnd || fPuncSet.contains(utext_current32(text))) {
                 goto foundBest;
             }
             do {
@@ -1141,7 +1141,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                     }
 
                     // If we're already at the end of the range, we're done
-                    if ((int32_t)utext_getNativeIndex(text) >= rangeEnd) {
+                    if ((int32_t)utext_getNativeIndex(text) >= rangeEnd || fPuncSet.contains(utext_current32(text))) {
                         goto foundBest;
                     }
 
@@ -1170,7 +1170,7 @@ doneBest:
         if (cuWordLength > 0) {
             if (unknownStart >= 0) {
                 // TODO We could also not add the break if cuWordLength or or unknownLength < KHMER_ROOT_COMBINE_THRESHOLD
-                if (!wjinhibit(current, text, scanStart, scanEnd, before, after, finalBefore, endZwsp)) {
+                if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
                     foundBreaks.push(current, status);
                 }
                 unknownStart = -1;
@@ -1180,7 +1180,7 @@ doneBest:
             int32_t currEnd = currPos;
             while (currPos  < rangeEnd) {
                 int32_t c = utext_current32(text);
-                if (!fMarkSet.contains(c))
+                if (!fMarkSet.contains(c) && !fPuncSet.contains(c))
                     break;
                 if (fViramaSet.contains(c)) {
                     utext_next32(text);
@@ -1190,7 +1190,7 @@ doneBest:
                 ++currPos;
             }
             int32_t endCandidate = current + cuWordLength + currPos - currEnd;
-            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after, finalBefore, endZwsp)) {
+            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
                 foundBreaks.push(endCandidate, status);
             }
         } else {

@@ -101,7 +101,7 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
 
   bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
   bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
-                 int32_t before, int32_t after, int32_t finalBefore, bool endZwsp) const;
+                 int32_t before, int32_t after) const;
 
   bool scanBeforeStart(UText *text, int32_t& start) const;
   bool scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end) const;
@@ -376,6 +376,7 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   UnicodeSet         fKhmerWordSet;
   //UnicodeSet         fEndWordSet;
   UnicodeSet         fBeginWordSet;
+  UnicodeSet         fPuncSet;
   DictionaryMatcher *fDictionary;
 
  public:
