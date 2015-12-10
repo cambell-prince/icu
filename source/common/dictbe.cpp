@@ -115,7 +115,7 @@ DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start) const {
     utext_setNativeIndex(ut, start);
     UChar32 c = utext_current32(ut);
     bool res = false;
-    while (start > 0) {
+    while (start >= 0) {
         if (!fSkipStartSet.contains(c)) {
             res = (c == ZWSP);
             break;
@@ -270,9 +270,9 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
 bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
                                       int32_t before, int32_t after, int32_t finalBefore, bool endZwsp) const {
     while (pos > after && scanWJ(text, start, end, before, after));
-    if (!endZwsp && after >= end)
-        finalBefore = end;
-    if (pos < before || pos < finalBefore)
+//    if (!endZwsp && after >= end)
+//        finalBefore = end;
+    if (pos < before) // || pos < finalBefore)
         return false;
     return true;
 }
@@ -1077,7 +1077,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     bool startZwsp = false;
 
     if (rangeStart > 0) {
-        utext_setNativeIndex(text, rangeStart - 1);
+        --scanStart;
         startZwsp = scanBeforeStart(text, scanStart);
     }
     utext_setNativeIndex(text, rangeStart);
@@ -1085,10 +1085,15 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd);
     utext_setNativeIndex(text, rangeEnd - 1);
     scanBackClusters(text, rangeStart, finalBefore);
+    if (finalBefore <= initAfter)    // the whole run is tented so no breaks
+        return 0;
 
-    scanWJ(text, rangeStart, rangeEnd, before, after);
-    if (startZwsp || initAfter >= before || initAfter >= finalBefore)
+    scanStart = rangeStart;
+    scanWJ(text, scanStart, rangeEnd, before, after);
+    if (startZwsp || initAfter >= before) {
         after = initAfter;
+        before = 0;
+    }
     if (!endZwsp && after > finalBefore && after < rangeEnd)
         endZwsp = true;
     if (endZwsp && before > finalBefore)

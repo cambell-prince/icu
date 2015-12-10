@@ -36,16 +36,30 @@ class TestKhmerBreaking(unittest.TestCase):
                 res = res + l[prev:curr] + '|'
             else :
                 res = res + l[prev:]
-        print res
+#        print res
         #outf.write(res)
         return res;
+
+    def doTest(self, t) :
+        self.maxDiff = None
+	s = t.replace(u"|", "")
+        result = self.break56(s)
+        self.assertEqual(t, result)
+        assert True == True, 'not really'
     
     def testOne(self):
-        self.maxDiff = None
-        s = u'រដ្ឋមន្ត្រី​ក្រសួង​ការបរទេស​កម្ពុជា​ដែល​រង​ការ​ចោទថា ជា​អតីត​មេ​គុក​បឹងត្របែក​សម័យ​ខ្មែរក្រហម អំពាវនាវ​ឱ្យ​អាជ្ញា​ធរមាន​សមត្ថកិច្ច​អនុវត្ត​សាលដីកា តាម​ចាប់ខ្លួន​មេដឹកនាំ​គណបក្សប្រឆាំង​ដែល​កំពុង​គេចខ្លួន​នៅ​ក្រៅប្រទេស​។​'
-        result = self.break56(s)
-        self.assertEqual(s, result)
-        assert True == True, 'not really'
+        s = u'រដ្ឋមន្ត្រី​|ក្រសួង​|ការបរទេស​|កម្ពុជា​|ដែល​|រង​|ការ​|ចោទថា |ជា​|អតីត​|មេ​|គុក​|បឹងត្របែក​|សម័យ​|ខ្មែរក្រហម |អំពាវនាវ​|ឱ្យ​|អាជ្ញា​|ធរមាន​|សមត្ថកិច្ច​|អនុវត្ត​|សាលដីកា |តាម​|ចាប់ខ្លួន​|មេដឹកនាំ​|គណបក្សប្រឆាំង​|ដែល​|កំពុង​|គេចខ្លួន​|នៅ​|ក្រៅប្រទេស​|។​|'
+        self.doTest(s)
+
+    def testTwo(self):
+        s = u'ថ្លែង|បែបនេះ|នៅក្នុង|កម្មវិធី|ជួបជុំ|ជាមួយ|តំណាង|យុវជន|មក|ពី|២៥|រាជធានី|ខេត្ត|ប្រមាណជា​|'
+        self.doTest(s)
+
+    def testThree(self):
+        self.doTest(u'នទ្រែល​|មា​|យោហាន|')
+
+    def testFour(self):
+        self.doTest(u'​|យេរូឆាលឹម​| |')
 
 if __name__ == '__main__' :
     unittest.main()
