@@ -42,7 +42,7 @@ class TestKhmerBreaking(unittest.TestCase):
 
     def doTest(self, t) :
         self.maxDiff = None
-	s = t.replace(u"|", "")
+        s = t.replace(u"|", "")
         result = self.break56(s)
         self.assertEqual(t, result)
         assert True == True, 'not really'

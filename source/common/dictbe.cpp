@@ -156,10 +156,8 @@ DictionaryBreakEngine::scanBackClusters(UText *text, int32_t textStart, int32_t&
         if (!fSkipEndSet.contains(c))
             break;
     }
-    for (int i = 0; i < clusterLimit; ++i) // scan backwards clusterLimit clusters
-    {
-        while (start > textStart)
-        {
+    for (int i = 0; i < clusterLimit; ++i) { // scan backwards clusterLimit clusters
+        while (start > textStart) {
             if (!fMarkSet.contains(c)) {
                 if (fBaseSet.contains(c)) {
                     c = utext_previous32(text);
@@ -167,9 +165,9 @@ DictionaryBreakEngine::scanBackClusters(UText *text, int32_t textStart, int32_t&
                         utext_next32(text);
                         c = utext_current32(text);
                         break;
-                    }
-                    else
+                    } else {
                         --start;
+                    }
                 } else {
                     break;
                 }
@@ -197,11 +195,9 @@ DictionaryBreakEngine::scanFwdClusters(UText *text, int32_t textEnd, int32_t& en
         c = utext_current32(text);
         ++end;
     }
-    for (int i = 0; i < clusterLimit; ++i)  // scan forwards clusterLimit clusters
-    {
+    for (int i = 0; i < clusterLimit; ++i) { // scan forwards clusterLimit clusters
         if (fBaseSet.contains(c)) {
-            while (end < textEnd)
-            {
+            while (end < textEnd) {
                 utext_next32(text);
                 c = utext_current32(text);
                 ++end;
@@ -230,15 +226,13 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
     utext_setNativeIndex(ut, nat);
     bool foundFirst = true;
     int32_t curr = start;
-    while (nat < end)
-    {
+    while (nat < end) {
         UChar32 c = utext_current32(ut);
-        if (c == ZWSP || c == WJ)
-        {
+        if (c == ZWSP || c == WJ) {
             curr = nat + 1;
-            if (foundFirst) // only scan backwards for first inhibitor
+            if (foundFirst)     // only scan backwards for first inhibitor
                 scanBackClusters(ut, start, before);
-            foundFirst = false;     // don't scan backwards if we go around again. Also marks found something
+            foundFirst = false; // don't scan backwards if we go around again. Also marks found something
 
             utext_next32(ut);
             scanFwdClusters(ut, end, after);
@@ -246,9 +240,9 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
 
             if (c == ZWSP || c == WJ) {  // did we hit another one?
                 continue;
-            }
-            else
+            } else {
                 break;
+            }
         }
 
         ++nat;                  // keep hunting
@@ -267,7 +261,8 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
     return true;                // yup hit one
 }
 
-bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
+bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text,
+                                      int32_t start, int32_t end,
                                       int32_t before, int32_t after) const {
     while (pos > after && scanWJ(text, start, end, before, after));
     if (pos < before)
