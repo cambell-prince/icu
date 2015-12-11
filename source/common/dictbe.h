@@ -373,11 +373,10 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
      * @internal
      */
 
-  UnicodeSet         fKhmerWordSet;
-  //UnicodeSet         fEndWordSet;
-  UnicodeSet         fBeginWordSet;
-  UnicodeSet         fPuncSet;
-  DictionaryMatcher *fDictionary;
+  UnicodeSet                fKhmerWordSet;
+  UnicodeSet                fBeginWordSet;
+  UnicodeSet                fPuncSet;
+  DictionaryMatcher        *fDictionary;
 
  public:
 
