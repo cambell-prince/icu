@@ -46,9 +46,6 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
 
   uint32_t      fTypes;
 
-  const int32_t WJ   = 0x2060;
-  const int32_t ZWSP = 0x200B;
-
   /**
    * <p>Default constructor.</p>
    *
@@ -56,6 +53,9 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   DictionaryBreakEngine();
 
  protected:
+
+  const int32_t WJ   = 0x2060;
+  const int32_t ZWSP = 0x200B;
 
   /**
    * A Unicode set of all viramas
@@ -377,6 +377,9 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   UnicodeSet                fBeginWordSet;
   UnicodeSet                fPuncSet;
   DictionaryMatcher        *fDictionary;
+
+  const int32_t BADSNLP = 256 * 20;
+  const uint32_t kuint32max = 0xFFFFFFFF;
 
  public:
 

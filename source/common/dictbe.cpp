@@ -1095,118 +1095,147 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         before = finalBefore;
 
     utext_setNativeIndex(text, rangeStart);
+    int32_t numCodePts = rangeEnd - rangeStart;
+    // bestSnlp[i] is the snlp of the best segmentation of the first i
+    // code points in the range to be matched.
+    UVector32 bestSnlp(numCodePts + 1, status);
+    bestSnlp.addElement(0, status);
+    for(int32_t i = 1; i <= numCodePts; i++) {
+        bestSnlp.addElement(kuint32max, status);
+    }
 
-    while (U_SUCCESS(status) && (current = (int32_t)utext_getNativeIndex(text)) < rangeEnd) {
-        cuWordLength = 0;
 
-        if (current > after) {
-            scanWJ(text, current, scanEnd, before, after);
-            if (!endZwsp) {
-                if (after >= scanEnd)
-                    finalBefore = scanEnd;  // no way back from here
-                else if (after > finalBefore)
-                    endZwsp = true;
-            }
-            if (endZwsp && before > finalBefore)
-                before = finalBefore;
+    // prev[i] is the index of the last CJK code point in the previous word in
+    // the best segmentation of the first i characters.
+    UVector32 prev(numCodePts + 1, status);
+    for(int32_t i = 0; i <= numCodePts; i++){
+        prev.addElement(kuint32max, status);
+    }
+
+    const int32_t maxWordSize = 20;
+    UVector32 values(numCodePts, status);
+    values.setSize(numCodePts);
+    UVector32 lengths(numCodePts, status);
+    lengths.setSize(numCodePts);
+
+    // Dynamic programming to find the best segmentation.
+
+    // In outer loop, i  is the code point index,
+    //                ix is the corresponding string (code unit) index.
+    //    They differ when the string contains supplementary characters.
+    int32_t ix = rangeStart;
+    for (int32_t i = 0;  i < numCodePts;  ++i, utext_setNativeIndex(text, ++ix)) {
+        if ((uint32_t)bestSnlp.elementAti(i) == kuint32max) {
+            continue;
         }
 
-        // Look for candidate words at the current position
-        int32_t candidates = words[wordsFound%KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2);
+        int32_t count;
+        count = fDictionary->matches(text, maxWordSize, numCodePts,
+                             NULL, lengths.getBuffer(), values.getBuffer(), NULL, &fIgnoreSet, 2);
+                             // Note: lengths is filled with code point lengths
+                             //       The NULL parameter is the ignored code unit lengths.
 
-        // If we found exactly one, use that
-        if (candidates == 1) {
-            cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-            wordsFound += 1;
-        }
-
-        // If there was more than one, see which one can take us forward the most words
-        else if (candidates > 1) {
-            // If we're already at the end of the range, we're done
-            if ((int32_t)utext_getNativeIndex(text) >= rangeEnd || fPuncSet.contains(utext_current32(text))) {
-                goto foundBest;
+        for (int32_t j = 0; j < count; j++) {
+            int32_t ln = lengths.elementAti(j);
+            utext_setNativeIndex(text, ln+ix);
+            int32_t c = utext_current32(text);
+            if (fMarkSet.contains(c) || c == 0x17D2) {
+                lengths.removeElementAt(j);
+                values.removeElementAt(j);
+                --j;
+                --count;
             }
-            do {
-                int32_t wordsMatched = 1;
-                if (words[(wordsFound + 1) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2) > 0) {
-                    if (wordsMatched < 2) {
-                        // Followed by another dictionary word; mark first word as a good candidate
-                        words[wordsFound % KHMER_LOOKAHEAD].markCurrent();
-                        wordsMatched = 2;
-                    }
-
-                    // If we're already at the end of the range, we're done
-                    if ((int32_t)utext_getNativeIndex(text) >= rangeEnd || fPuncSet.contains(utext_current32(text))) {
-                        goto foundBest;
-                    }
-
-                    // See if any of the possible second words is followed by a third word
-                    do {
-                        // If we find a third word, stop right away
-                        if (words[(wordsFound + 2) % KHMER_LOOKAHEAD].candidates(text, fDictionary, rangeEnd, &fIgnoreSet, 2)) {
-                            words[wordsFound % KHMER_LOOKAHEAD].markCurrent();
-                            goto foundBest;
+        }
+        if (count == 0) {
+            utext_setNativeIndex(text, ix);
+            int32_t c = utext_current32(text);
+            if (fPuncSet.contains(c) || c == ZWSP || c == WJ) {
+                values.setElementAt(0, count);
+                lengths.setElementAt(1, count++);
+            } else if (fBaseSet.contains(c)) {
+                int32_t currix = utext_getNativeIndex(text);
+                do {
+                    utext_next32(text);
+                    c = utext_current32(text);
+                    if (c == 0x17D2) {
+                        utext_next32(text);
+                        c = utext_current32(text);
+                        if (!fBaseSet.contains(c)) {
+                            break;
+                        } else {
+                            utext_next32(text);
+                            c = utext_current32(text);
                         }
                     }
-                    while (words[(wordsFound + 1) % KHMER_LOOKAHEAD].backUp(text));
-                }
+                } while (fMarkSet.contains(c));
+                values.setElementAt(BADSNLP, count);
+                lengths.setElementAt(utext_getNativeIndex(text) - currix, count++);
+            } else {
+                values.setElementAt(BADSNLP, count);
+                lengths.setElementAt(1, count++);
             }
-            while (words[wordsFound % KHMER_LOOKAHEAD].backUp(text));
-            // failed to find a suitable break so advance and try again
-            goto doneBest;
-foundBest:
-            cuWordLength = words[wordsFound % KHMER_LOOKAHEAD].acceptMarked(text);
-            ++wordsFound;
         }
-doneBest:
-        utext_setNativeIndex(text, current+cuWordLength);
 
-        // Did we find a word on this iteration? If so, push it on the break stack
-        if (cuWordLength > 0) {
-            if (unknownStart >= 0) {
-                // TODO We could also not add the break if cuWordLength or or unknownLength < KHMER_ROOT_COMBINE_THRESHOLD
-                if (!wjinhibit(current, text, scanStart, scanEnd, before, after)) {
-                    foundBreaks.push(current, status);
-                }
-                unknownStart = -1;
-            }
-            // skip anything combining that follows on
-            int32_t currPos = (int32_t)utext_getNativeIndex(text);
-            int32_t currEnd = currPos;
-            while (currPos  < rangeEnd) {
-                int32_t c = utext_current32(text);
-                if (!fMarkSet.contains(c) && !fPuncSet.contains(c))
-                    break;
-                if (fViramaSet.contains(c)) {
-                    utext_next32(text);
-                    ++currPos;
-                }
+        for (int32_t j = 0; j < count; j++) {
+            uint32_t v = (uint32_t)values.elementAti(j);
+            uint32_t newSnlp = (uint32_t)bestSnlp.elementAti(i) + v;
+            int32_t ln = lengths.elementAti(j);
+            utext_setNativeIndex(text, ln+ix);
+            int32_t c = utext_current32(text);
+            while (fPuncSet.contains(c)) {
+                ++ln;
                 utext_next32(text);
-                ++currPos;
-            }
-            int32_t endCandidate = current + cuWordLength + currPos - currEnd;
-            if (!wjinhibit(endCandidate, text, scanStart, scanEnd, before, after)) {
-                foundBreaks.push(endCandidate, status);
-            }
-        } else {
-            int32_t currPos = utext_getNativeIndex(text);
-            if (unknownStart < 0) {
-                unknownStart = currPos;
-            }
-            while (currPos < rangeEnd) {
-                int32_t c;
-                utext_next32(text);
-                currPos++;
                 c = utext_current32(text);
-                if (fViramaSet.contains(c)) {
-                    utext_next32(text);
-                    utext_next32(text);
-                    currPos += 2;
-                    c = utext_current32(text);
-                }
-                if (fBeginWordSet.contains(c))
-                    break;
             }
+            int32_t ln_j_i = ln + i;
+            if (newSnlp < (uint32_t)bestSnlp.elementAti(ln_j_i)) {
+                if (v == BADSNLP) {
+                    int32_t p = prev.elementAti(i);
+                    if (p < 0)
+                        prev.setElementAt(p, ln_j_i);
+                    else
+                        prev.setElementAt(-i, ln_j_i);
+                }
+                else
+                    prev.setElementAt(i, ln_j_i);
+                bestSnlp.setElementAt(newSnlp, ln_j_i);
+            }
+        }
+    }
+    // Start pushing the optimal offset index into t_boundary (t for tentative).
+    // prev[numCodePts] is guaranteed to be meaningful.
+    // We'll first push in the reverse order, i.e.,
+    // t_boundary[0] = numCodePts, and afterwards do a swap.
+    UVector32 t_boundary(numCodePts+1, status);
+
+    int32_t numBreaks = 0;
+    // No segmentation found, set boundary to end of range
+    while (numCodePts >= 0 && bestSnlp.elementAti(numCodePts) == kuint32max) {
+        --numCodePts;
+    }
+    if (numCodePts < 0) {
+        t_boundary.addElement(numCodePts, status);
+        numBreaks++;
+    } else {
+        for (int32_t i = numCodePts; i != kuint32max; i = prev.elementAti(i)) {
+            if (i < 0) i = -i;
+            t_boundary.addElement(i, status);
+            numBreaks++;
+        }
+        U_ASSERT(prev.elementAti(t_boundary.elementAti(numBreaks - 1)) == 0);
+    }
+
+    // Now that we're done, convert positions in t_boundary[] (indices in
+    // the normalized input string) back to indices in the original input UText
+    // while reversing t_boundary and pushing values to foundBreaks.
+    for (int32_t i = numBreaks-1; i >= 0; i--) {
+        int32_t cpPos = t_boundary.elementAti(i);
+        int32_t utextPos = cpPos + rangeStart;
+        while (utextPos > after && scanWJ(text, utextPos, scanEnd, before, after));
+        if (utextPos < before) {
+        // Boundaries are added to foundBreaks output in ascending order.
+            U_ASSERT(foundBreaks.size() == 0 ||foundBreaks.peeki() < utextPos);
+            foundBreaks.push(utextPos, status);
         }
     }
 
