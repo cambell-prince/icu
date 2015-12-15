@@ -179,7 +179,7 @@ endif
 endif
 endif
 
-packagedata: icupkg.inc $(PKGDATA_LIST) build-local
+packagedata: icupkg.inc $(PKGDATA_LIST) build-local $(BRKBLDDIR)/khmerdict.dict
 ifneq ($(ENABLE_STATIC),)
 ifeq ($(PKGDATA_MODE),dll)
 	$(PKGDATA_INVOKE) $(PKGDATA) -e $(ICUDATA_ENTRY_POINT) -T $(OUTTMPDIR) -p $(ICUDATA_NAME) $(PKGDATA_LIBSTATICNAME) -m static $(PKGDATA_VERSIONING) $(PKGDATA_LIST)
@@ -488,6 +488,7 @@ ifneq ($(ICUDATA_SOURCE_IS_NATIVE_TARGET),YES)
 	@echo "Unpacking $(ICUDATA_SOURCE_ARCHIVE) and generating $@ (list of data files)"
 	@-$(RMV) $@
 	$(INVOKE) $(TOOLBINDIR)/icupkg -d $(BUILDDIR) --list -x \* $(ICUDATA_SOURCE_ARCHIVE) -o $@
+	rm $(BRKBLDDIR)/khmerdict.dict
 else
 	@echo "$@" > $@
 endif
@@ -563,7 +564,10 @@ $(BRKBLDDIR)/burmesedict.dict: $(TOOLBINDIR)/gendict$(TOOLEXEEXT) $(DAT_FILES)
 	$(INVOKE) $(TOOLBINDIR)/gendict --bytes --transform offset-0x1000 -c -i $(BUILDDIR) $(BRKSRCDIR)/burmesedict.txt $(BRKBLDDIR)/burmesedict.dict
 
 # TODO: figure out why combining characters are here?
-$(BRKBLDDIR)/khmerdict.dict: $(TOOLBINDIR)/gendict$(TOOLEXEEXT) $(DAT_FILES)
+#$(BRKBLDDIR)/khmerdict.dict: $(TOOLBINDIR)/gendict$(TOOLEXEEXT) $(DAT_FILES)
+#	$(INVOKE) $(TOOLBINDIR)/gendict --bytes --transform offset-0x1780 -c -i $(BUILDDIR) $(BRKSRCDIR)/khmerdict.txt $(BRKBLDDIR)/khmerdict.dict
+
+$(BRKBLDDIR)/khmerdict.dict: $(TOOLBINDIR)/gendict$(TOOLEXEEXT)
 	$(INVOKE) $(TOOLBINDIR)/gendict --bytes --transform offset-0x1780 -c -i $(BUILDDIR) $(BRKSRCDIR)/khmerdict.txt $(BRKBLDDIR)/khmerdict.dict
 
 ####################################################    CFU
