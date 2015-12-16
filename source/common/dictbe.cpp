@@ -1160,14 +1160,18 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                 do {
                     utext_next32(text);
                     c = utext_current32(text);
+                    if (utext_getNativeIndex(text) >= rangeEnd)
+                        break;
                     if (c == 0x17D2) {
                         utext_next32(text);
                         c = utext_current32(text);
-                        if (!fBaseSet.contains(c)) {
+                        if (!fBaseSet.contains(c) || utext_getNativeIndex(text) >= rangeEnd) {
                             break;
                         } else {
                             utext_next32(text);
                             c = utext_current32(text);
+                            if (utext_getNativeIndex(text) >= rangeEnd)
+                                break;
                         }
                     }
                 } while (fMarkSet.contains(c));
