@@ -379,7 +379,7 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   DictionaryMatcher        *fDictionary;
 
   const int32_t BADSNLP = 256 * 20;
-  const uint32_t kuint32max = 0xFFFFFFFF;
+  const uint32_t kuint32max = 0x7FFFFFFF;
 
  public:
 

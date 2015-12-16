@@ -1113,10 +1113,10 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     }
 
     const int32_t maxWordSize = 20;
-    UVector32 values(numCodePts, status);
-    values.setSize(numCodePts);
-    UVector32 lengths(numCodePts, status);
-    lengths.setSize(numCodePts);
+    UVector32 values(maxWordSize, status);
+    values.setSize(maxWordSize);
+    UVector32 lengths(maxWordSize, status);
+    lengths.setSize(maxWordSize);
 
     // Dynamic programming to find the best segmentation.
 
@@ -1130,13 +1130,15 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         }
 
         int32_t count;
-        count = fDictionary->matches(text, maxWordSize, numCodePts,
+        count = fDictionary->matches(text, numCodePts - i, maxWordSize,
                              NULL, lengths.getBuffer(), values.getBuffer(), NULL, &fIgnoreSet, 2);
                              // Note: lengths is filled with code point lengths
                              //       The NULL parameter is the ignored code unit lengths.
 
         for (int32_t j = 0; j < count; j++) {
             int32_t ln = lengths.elementAti(j);
+            if (ln + i >= numCodePts)
+                continue;
             utext_setNativeIndex(text, ln+ix);
             int32_t c = utext_current32(text);
             if (fMarkSet.contains(c) || c == 0x17D2) {
