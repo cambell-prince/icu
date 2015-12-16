@@ -1020,7 +1020,7 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 
     clusterLimit = 3;
 
-    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]\\u2060]"), status);
+    fKhmerWordSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]\\u2060\\u200C\\u200D]"), status);
     if (U_SUCCESS(status)) {
         setCharacters(fKhmerWordSet);
     }
@@ -1032,10 +1032,11 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
 //    fBeginWordSet.add(0x0E40, 0x0E44);      // SARA E through SARA AI MAIMALAI
 //    fSuffixSet.add(THAI_PAIYANNOI);
 //    fSuffixSet.add(THAI_MAIYAMOK);
-    fIgnoreSet.add(0x2060); // WJ
+    fIgnoreSet.add(0x2060);         // WJ
+    fIgnoreSet.add(0x200C, 0x200D); // ZWJ, ZWNJ
     fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:^M:]]"), status);
     fPuncSet.applyPattern(UNICODE_STRING_SIMPLE("[\\u17D4\\u17D5\\u17D6\\u17D7\\u17D9:]"), status);
-    fKhmerWordSet.addAll(fPuncSet);
+//    fKhmerWordSet.addAll(fPuncSet);
 
     // Compact for caching.
     fMarkSet.compact();
@@ -1080,7 +1081,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd);
     utext_setNativeIndex(text, rangeEnd - 1);
     scanBackClusters(text, rangeStart, finalBefore);
-    if (finalBefore <= initAfter)    // the whole run is tented so no breaks
+    if (finalBefore < initAfter)    // the whole run is tented so no breaks
         return 0;
 
     scanStart = rangeStart;
@@ -1232,6 +1233,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     // while reversing t_boundary and pushing values to foundBreaks.
     for (int32_t i = numBreaks-1; i >= 0; i--) {
         int32_t cpPos = t_boundary.elementAti(i);
+        if (cpPos == 0) continue;
         int32_t utextPos = cpPos + rangeStart;
         while (utextPos > after && scanWJ(text, utextPos, scanEnd, before, after));
         if (utextPos < before) {
