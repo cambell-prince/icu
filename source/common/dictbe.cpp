@@ -1057,7 +1057,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         return 0;       // Not enough characters for two words
     }
 
-    uint32_t wordsFound = 0;
+    uint32_t wordsFound = foundBreaks.size();
     int32_t cuWordLength = 0;
     int32_t current;
     UErrorCode status = U_ZERO_ERROR;
@@ -1251,7 +1251,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     if (foundBreaks.peeki() >= rangeEnd) {
         (void) foundBreaks.popi();
     }
-    return foundBreaks.size();
+    return foundBreaks.size() - wordsFound;
 }
 
 #if !UCONFIG_NO_NORMALIZATION
