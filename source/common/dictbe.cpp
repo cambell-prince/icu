@@ -109,12 +109,13 @@ DictionaryBreakEngine::setCharacters( const UnicodeSet &set ) {
 }
 
 bool
-DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start) const {
+DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start, bool &doBreak) const {
     UErrorCode status = U_ZERO_ERROR;
     UText* ut = utext_clone(NULL, text, false, true, &status);
     utext_setNativeIndex(ut, start);
     UChar32 c = utext_current32(ut);
     bool res = false;
+    doBreak = true;
     while (start >= 0) {
         if (!fSkipStartSet.contains(c)) {
             res = (c == ZWSP);
@@ -122,18 +123,20 @@ DictionaryBreakEngine::scanBeforeStart(UText *text, int32_t& start) const {
         }
         --start;
         c = utext_previous32(ut);
+        doBreak = false;
     }
     utext_close(ut);
     return res;
 }
 
 bool
-DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end) const {
+DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end, bool &doBreak) const {
     UErrorCode status = U_ZERO_ERROR;
     UText* ut = utext_clone(NULL, text, false, true, &status);
     utext_setNativeIndex(ut, end);
     UChar32 c = utext_current32(ut);
     bool res = false;
+    doBreak = true;
     while (end < textEnd) {
         if (!fSkipEndSet.contains(c)) {
             res = (c == ZWSP);
@@ -141,6 +144,7 @@ DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end) 
         }
         ++end;
         c = utext_next32(ut);
+        doBreak = false;
     }
     utext_close(ut);
     return res;
@@ -1071,14 +1075,16 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
 
     int32_t unknownStart = -1;
     bool startZwsp = false;
+    bool breakStart = false;
+    bool breakEnd = false;
 
     if (rangeStart > 0) {
         --scanStart;
-        startZwsp = scanBeforeStart(text, scanStart);
+        startZwsp = scanBeforeStart(text, scanStart, breakStart);
     }
     utext_setNativeIndex(text, rangeStart);
     scanFwdClusters(text, rangeEnd, initAfter);
-    bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd);
+    bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd, breakEnd);
     utext_setNativeIndex(text, rangeEnd - 1);
     scanBackClusters(text, rangeStart, finalBefore);
     if (finalBefore < initAfter)    // the whole run is tented so no breaks
@@ -1237,7 +1243,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     // while reversing t_boundary and pushing values to foundBreaks.
     for (int32_t i = numBreaks-1; i >= 0; i--) {
         int32_t cpPos = t_boundary.elementAti(i);
-        if (cpPos == 0) continue;
+        if (cpPos == 0 && !breakStart && fTypes >= UBRK_LINE) continue;
         int32_t utextPos = cpPos + rangeStart;
         while (utextPos > after && scanWJ(text, utextPos, scanEnd, before, after));
         if (utextPos < before) {
@@ -1248,7 +1254,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     }
 
     // Don't return a break for the end of the dictionary range if there is one there.
-    if (foundBreaks.peeki() >= rangeEnd) {
+    if (!breakEnd && fTypes >= UBRK_LINE && foundBreaks.peeki() >= rangeEnd) {
         (void) foundBreaks.popi();
     }
     return foundBreaks.size() - wordsFound;

@@ -39,13 +39,6 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
 
   UnicodeSet    fSet;
 
-    /**
-     * The set of break types handled by this engine
-     * @internal
-     */
-
-  uint32_t      fTypes;
-
   /**
    * <p>Default constructor.</p>
    *
@@ -53,6 +46,13 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   DictionaryBreakEngine();
 
  protected:
+
+    /**
+     * The set of break types handled by this engine
+     * @internal
+     */
+
+  uint32_t      fTypes;
 
   const int32_t WJ   = 0x2060;
   const int32_t ZWSP = 0x200B;
@@ -103,8 +103,8 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
                  int32_t before, int32_t after) const;
 
-  bool scanBeforeStart(UText *text, int32_t& start) const;
-  bool scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end) const;
+  bool scanBeforeStart(UText *text, int32_t& start, bool &doBreak) const;
+  bool scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end, bool &doBreak) const;
   void scanBackClusters(UText *text, int32_t textStart, int32_t& start) const;
   void scanFwdClusters(UText *text, int32_t textEnd, int32_t& end) const;
 
