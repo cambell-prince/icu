@@ -1,0 +1,9 @@
+#!/bin/bash
+git diff v0 -- \
+  source/common/dictbe.cpp \
+  source/common/dictbe.h \
+  source/common/dictionarydata.cpp \
+  source/common/dictionarydata.h \
+  source/data/Makefile.in \
+  source/data/brkitr/khmerdict.txt \
+| sed -e "s/--- a/--- misc\/icu/" -e  "s/+++ b/+++ build\/icu/"

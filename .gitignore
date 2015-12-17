@@ -1,5 +1,7 @@
 .settings/
 *.o
+*.d
 *.pyc
 lib/
 source/bin
+out/
