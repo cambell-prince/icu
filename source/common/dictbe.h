@@ -32,12 +32,6 @@ class Normalizer2;
  */
 class DictionaryBreakEngine : public LanguageBreakEngine {
  private:
-    /**
-     * The set of characters handled by this engine
-     * @internal
-     */
-
-  UnicodeSet    fSet;
 
   /**
    * <p>Default constructor.</p>
@@ -46,6 +40,13 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   DictionaryBreakEngine();
 
  protected:
+
+    /**
+     * The set of characters handled by this engine
+     * @internal
+     */
+
+  UnicodeSet    fSet;
 
     /**
      * The set of break types handled by this engine
@@ -106,8 +107,6 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   int32_t clusterLimit;
 
   bool scanWJ(UText *text, int32_t &start, int32_t end, int32_t &before, int32_t &after) const;
-  bool wjinhibit(int32_t pos, UText *text, int32_t start, int32_t end,
-                 int32_t before, int32_t after) const;
 
   bool scanBeforeStart(UText *text, int32_t& start, bool &doBreak) const;
   bool scanAfterEnd(UText *text, int32_t rangeEnd, int32_t& end, bool &doBreak) const;

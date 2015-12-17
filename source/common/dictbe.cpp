@@ -137,11 +137,8 @@ DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end, 
     utext_setNativeIndex(ut, end);
     UChar32 c = utext_current32(ut);
     bool res = false;
-    doBreak = true;
+    doBreak = !fNBeforeSet.contains(c);
     while (end < textEnd) {
-        if (fNBeforeSet.contains(c)) {
-            doBreak = false;
-        }
         if (!fSkipEndSet.contains(c)) {
             res = (c == ZWSP);
             break;
@@ -267,15 +264,6 @@ DictionaryBreakEngine::scanWJ(UText *text, int32_t &start, int32_t end, int32_t 
         start = curr;
     }
     return true;                // yup hit one
-}
-
-bool DictionaryBreakEngine::wjinhibit(int32_t pos, UText *text,
-                                      int32_t start, int32_t end,
-                                      int32_t before, int32_t after) const {
-    while (pos > after && scanWJ(text, start, end, before, after));
-    if (pos < before)
-        return false;
-    return true;
 }
 
 /*
@@ -1005,22 +993,6 @@ foundBest:
  * KhmerBreakEngine
  */
 
-// How many words in a row are "good enough"?
-static const int32_t KHMER_LOOKAHEAD = 3;
-
-// Will not combine a non-word with a preceding dictionary word longer than this
-//static const int32_t KHMER_ROOT_COMBINE_THRESHOLD = 3;
-
-// Will not combine a non-word that shares at least this much prefix with a
-// dictionary word, with a preceding word
-//static const int32_t KHMER_PREFIX_COMBINE_THRESHOLD = 3;
-
-// Minimum word size
-static const int32_t KHMER_MIN_WORD = 2;
-
-// Minimum number of characters for two words
-static const int32_t KHMER_MIN_WORD_SPAN = KHMER_MIN_WORD * 2;
-
 KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCode &status)
     : DictionaryBreakEngine((1 << UBRK_WORD) | (1 << UBRK_LINE)),
       fDictionary(adoptDictionary)
@@ -1034,22 +1006,16 @@ KhmerBreakEngine::KhmerBreakEngine(DictionaryMatcher *adoptDictionary, UErrorCod
     }
     fMarkSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:LineBreak=SA:]&[:M:]]"), status);
     fMarkSet.add(0x0020);
-    fBeginWordSet.add(0x1780, 0x17B3);
-//    fBeginWordSet.add(0x17A3, 0x17A4);      // deprecated vowels
-//    fBeginWordSet.add(0x0E01, 0x0E2E);      // KO KAI through HO NOKHUK
-//    fBeginWordSet.add(0x0E40, 0x0E44);      // SARA E through SARA AI MAIMALAI
-//    fSuffixSet.add(THAI_PAIYANNOI);
-//    fSuffixSet.add(THAI_MAIYAMOK);
     fIgnoreSet.add(0x2060);         // WJ
     fIgnoreSet.add(0x200C, 0x200D); // ZWJ, ZWNJ
     fBaseSet.applyPattern(UNICODE_STRING_SIMPLE("[[:Khmr:]&[:^M:]]"), status);
     fPuncSet.applyPattern(UNICODE_STRING_SIMPLE("[\\u17D4\\u17D5\\u17D6\\u17D7\\u17D9:]"), status);
-//    fKhmerWordSet.addAll(fPuncSet);
 
     // Compact for caching.
     fMarkSet.compact();
-    fBeginWordSet.compact();
-//    fSuffixSet.compact();
+	fIgnoreSet.compact();
+	fBaseSet.compact();
+	fPuncSet.compact();
 }
 
 KhmerBreakEngine::~KhmerBreakEngine() {
@@ -1061,10 +1027,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                                                 int32_t rangeStart,
                                                 int32_t rangeEnd,
                                                 UStack &foundBreaks ) const {
-    if ((rangeEnd - rangeStart) < KHMER_MIN_WORD_SPAN) {
-        return 0;       // Not enough characters for two words
-    }
-
     uint32_t wordsFound = foundBreaks.size();
     UErrorCode status = U_ZERO_ERROR;
     int32_t before = 0;
@@ -1116,11 +1078,11 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         bestSnlp.addElement(kuint32max, status);
     }
 
-
-    // prev[i] is the index of the last CJK code point in the previous word in
-    // the best segmentation of the first i characters.
+    // prev[i] is the index of the last code point in the previous word in
+    // the best segmentation of the first i characters. Note negative implies
+	// that the code point is part of an unknown word.
     UVector32 prev(numCodePts + 1, status);
-    for(int32_t i = 0; i <= numCodePts; i++){
+    for(int32_t i = 0; i <= numCodePts; i++) {
         prev.addElement(kuint32max, status);
     }
 
@@ -1153,7 +1115,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                 continue;
             utext_setNativeIndex(text, ln+ix);
             int32_t c = utext_current32(text);
-            if (fMarkSet.contains(c) || c == 0x17D2) {
+            if (fMarkSet.contains(c) || c == 0x17D2) { // Coeng
                 lengths.removeElementAt(j);
                 values.removeElementAt(j);
                 --j;
@@ -1173,7 +1135,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                     c = utext_current32(text);
                     if (utext_getNativeIndex(text) >= rangeEnd)
                         break;
-                    if (c == 0x17D2) {
+                    if (c == 0x17D2) { // Coeng
                         utext_next32(text);
                         c = utext_current32(text);
                         if (!fBaseSet.contains(c) || utext_getNativeIndex(text) >= rangeEnd) {
