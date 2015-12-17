@@ -94,6 +94,12 @@ class DictionaryBreakEngine : public LanguageBreakEngine {
   UnicodeSet    fSkipEndSet;
 
   /**
+   * A Unicode set of all characters that should not be broken before
+   * @internal
+   */
+  UnicodeSet    fNBeforeSet;
+
+  /**
    * The number of clusters within which breaks are inhibited
    * @internal
    */
@@ -378,7 +384,7 @@ class KhmerBreakEngine : public DictionaryBreakEngine {
   UnicodeSet                fPuncSet;
   DictionaryMatcher        *fDictionary;
 
-  const int32_t BADSNLP = 256 * 20;
+  const uint32_t BADSNLP = 256 * 20;
   const uint32_t kuint32max = 0x7FFFFFFF;
 
  public:

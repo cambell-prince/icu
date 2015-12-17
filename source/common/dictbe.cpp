@@ -35,7 +35,8 @@ DictionaryBreakEngine::DictionaryBreakEngine(uint32_t breakTypes) :
     fViramaSet.applyPattern(UNICODE_STRING_SIMPLE("[[:ccc=VR:]]"), status);
 
     fSkipStartSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=OP:][:lb=QU:]]"), status);
-    fSkipEndSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=CP:][:lb=QU:][:lb=EX:]]"), status);
+    fSkipEndSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=CP:][:lb=QU:][:lb=EX:][:lb=CL:]]"), status);
+    fNBeforeSet.applyPattern(UNICODE_STRING_SIMPLE("[[:lb=CR:][:lb=LF:][:lb=NL:][:lb=SP:][:lb=ZW:][:lb=IS:][:lb=BA:][:lb=NS:]]"), status);
 }
 
 DictionaryBreakEngine::~DictionaryBreakEngine() {
@@ -138,6 +139,9 @@ DictionaryBreakEngine::scanAfterEnd(UText *text, int32_t textEnd, int32_t& end, 
     bool res = false;
     doBreak = true;
     while (end < textEnd) {
+        if (fNBeforeSet.contains(c)) {
+            doBreak = false;
+        }
         if (!fSkipEndSet.contains(c)) {
             res = (c == ZWSP);
             break;
@@ -1062,10 +1066,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     }
 
     uint32_t wordsFound = foundBreaks.size();
-    int32_t cuWordLength = 0;
-    int32_t current;
     UErrorCode status = U_ZERO_ERROR;
-    PossibleWord words[KHMER_LOOKAHEAD];
     int32_t before = 0;
     int32_t after = 0;
     int32_t finalBefore = 0;
@@ -1073,7 +1074,6 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     int32_t scanStart = rangeStart;
     int32_t scanEnd = rangeEnd;
 
-    int32_t unknownStart = -1;
     bool startZwsp = false;
     bool breakStart = false;
     bool breakEnd = false;
@@ -1087,8 +1087,13 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
     bool endZwsp = scanAfterEnd(text, utext_nativeLength(text), scanEnd, breakEnd);
     utext_setNativeIndex(text, rangeEnd - 1);
     scanBackClusters(text, rangeStart, finalBefore);
-    if (finalBefore < initAfter)    // the whole run is tented so no breaks
-        return 0;
+    if (finalBefore < initAfter) {   // the whole run is tented so no breaks
+        if (breakStart || fTypes < UBRK_LINE)
+            foundBreaks.push(rangeStart, status);
+        if (breakEnd || fTypes < UBRK_LINE)
+            foundBreaks.push(rangeEnd, status);
+        return foundBreaks.size() - wordsFound;
+    }
 
     scanStart = rangeStart;
     scanWJ(text, scanStart, rangeEnd, before, after);
@@ -1190,8 +1195,8 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
         }
 
         for (int32_t j = 0; j < count; j++) {
-            uint32_t v = (uint32_t)values.elementAti(j);
-            uint32_t newSnlp = (uint32_t)bestSnlp.elementAti(i) + v;
+            uint32_t v = values.elementAti(j);
+            int32_t newSnlp = bestSnlp.elementAti(i) + v;
             int32_t ln = lengths.elementAti(j);
             utext_setNativeIndex(text, ln+ix);
             int32_t c = utext_current32(text);
@@ -1201,7 +1206,7 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
                 c = utext_current32(text);
             }
             int32_t ln_j_i = ln + i;
-            if (newSnlp < (uint32_t)bestSnlp.elementAti(ln_j_i)) {
+            if (newSnlp < bestSnlp.elementAti(ln_j_i)) {
                 if (v == BADSNLP) {
                     int32_t p = prev.elementAti(i);
                     if (p < 0)
@@ -1223,14 +1228,14 @@ KhmerBreakEngine::divideUpDictionaryRange( UText *text,
 
     int32_t numBreaks = 0;
     // No segmentation found, set boundary to end of range
-    while (numCodePts >= 0 && bestSnlp.elementAti(numCodePts) == kuint32max) {
+    while (numCodePts >= 0 && (uint32_t)bestSnlp.elementAti(numCodePts) == kuint32max) {
         --numCodePts;
     }
     if (numCodePts < 0) {
         t_boundary.addElement(numCodePts, status);
         numBreaks++;
     } else {
-        for (int32_t i = numCodePts; i != kuint32max; i = prev.elementAti(i)) {
+        for (int32_t i = numCodePts; (uint32_t)i != kuint32max; i = prev.elementAti(i)) {
             if (i < 0) i = -i;
             t_boundary.addElement(i, status);
             numBreaks++;
