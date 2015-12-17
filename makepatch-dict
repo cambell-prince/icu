@@ -1,0 +1,4 @@
+#!/bin/bash
+git diff v0 -- \
+  source/data/brkitr/khmerdict.txt \
+| sed -e "s/--- a/--- misc\/icu/" -e  "s/+++ b/+++ build\/icu/"
